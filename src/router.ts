@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { FeedItem } from './lib/types'
 
 /** Tiny hash router: '#/article/abc' → ['article', 'abc']. Works offline and with the back button. */
 export function useRoute(): string[] {
@@ -22,4 +23,15 @@ export function go(...parts: string[]) {
 export function back() {
   if (window.history.length > 1) window.history.back()
   else go()
+}
+
+/** Opens an item in the reader or the player. With replace, Back still returns to the feed. */
+export function openItem(item: FeedItem, replace = false) {
+  const hash = '#/' + (item.type === 'video' && item.videoId ? 'video' : 'article') + '/' + encodeURIComponent(item.id)
+  if (replace) window.location.replace(hash)
+  else window.location.hash = hash
+}
+
+export function goReplace(...parts: string[]) {
+  window.location.replace('#/' + parts.map(encodeURIComponent).join('/'))
 }

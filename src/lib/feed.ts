@@ -117,3 +117,14 @@ export function dayKey(now: number, openHour: number): string {
   const d = new Date(now - openHour * 60 * 60 * 1000)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
+
+/**
+ * The item "Next" leads to: the next unseen item after the current one in feed order,
+ * wrapping around to earlier unseen items. Null when everything else is seen (→ Done).
+ */
+export function nextItem(items: FeedItem[], currentId: string, seen: Record<string, number>): FeedItem | null {
+  const i = items.findIndex((it) => it.id === currentId)
+  const after = items.slice(i + 1).find((it) => !seen[it.id] && it.id !== currentId)
+  if (after) return after
+  return items.slice(0, Math.max(i, 0)).find((it) => !seen[it.id] && it.id !== currentId) ?? null
+}

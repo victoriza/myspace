@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDailyFeed, estimateMinutes, orderMixed, pickDaily, totalMinutes } from './feed'
+import { buildDailyFeed, estimateMinutes, nextItem, orderMixed, pickDaily, totalMinutes } from './feed'
 import { parseFeed } from './parse'
 import { defaultEnabledSources } from './sources'
 import { defaultSettings } from './storage'
@@ -88,5 +88,15 @@ describe('suggested sources', () => {
     expect(defaultEnabledSources('ca')).toContain('metode')
     expect(defaultEnabledSources('es')).not.toContain('metode')
     expect(defaultEnabledSources('es')).toContain('noticias-positivas')
+  })
+})
+
+describe('next item', () => {
+  const items = [item(1), item(2), item(3), item(4)]
+  it('goes to the following unseen item, then wraps, then ends', () => {
+    expect(nextItem(items, 'i1', {})?.id).toBe('i2')
+    expect(nextItem(items, 'i2', { i3: 1 })?.id).toBe('i4')
+    expect(nextItem(items, 'i4', { i2: 1, i3: 1 })?.id).toBe('i1')
+    expect(nextItem(items, 'i4', { i1: 1, i2: 1, i3: 1, i4: 1 })).toBeNull()
   })
 })

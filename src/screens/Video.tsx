@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon, TypeTag } from '../components/ui'
 import { timeAgo } from '../lib/time'
+import { NextBar } from '../components/NextBar'
 import { back, go } from '../router'
 import { useApp } from '../state'
 
 export function Video({ id }: { id: string }) {
   const { t, i18n } = useTranslation()
-  const { itemById, markSeen, seen, today, settings, updateSettings } = useApp()
+  const { itemById, markSeen, settings, updateSettings } = useApp()
   const item = itemById(id)
   const [hidden, setHidden] = useState(false)
 
@@ -24,7 +25,6 @@ export function Video({ id }: { id: string }) {
     )
   }
 
-  const next = today?.items.find((i) => i.id !== item.id && !seen[i.id])
   const hideChannel = () => {
     updateSettings({ blockedChannels: [...new Set([...settings.blockedChannels, item.sourceId])] })
     setHidden(true)
@@ -60,17 +60,9 @@ export function Video({ id }: { id: string }) {
           <a className="btn-secondary" href={item.link} target="_blank" rel="noopener noreferrer">{t('video.onYouTube')}</a>
         </div>
 
-        {next ? (
-          <>
-            <h2 className="section-label">{t('video.upNext')}</h2>
-            <button className="card text-card" onClick={() => go(next.type === 'video' && next.videoId ? 'video' : 'article', next.id)}>
-              <span className="meta"><TypeTag type={next.type} /><span className="muted">{next.sourceName}</span></span>
-              <span className="title">{next.title}</span>
-            </button>
-          </>
-        ) : null}
         <p className="muted small">{t('video.noAutoplay')}</p>
       </main>
+      <NextBar currentId={item.id} />
     </div>
   )
 }

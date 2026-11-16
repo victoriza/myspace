@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { hostOf, Icon, TypeTag } from '../components/ui'
 import { firstSentence } from '../lib/parse'
 import { readingMinutes, timeAgo } from '../lib/time'
+import { NextBar } from '../components/NextBar'
 import { back, go } from '../router'
 import { useApp } from '../state'
 
@@ -11,7 +12,7 @@ const SIZES = [16, 18, 21]
 
 export function Article({ id }: { id: string }) {
   const { t, i18n } = useTranslation()
-  const { itemById, markSeen, today, seen } = useApp()
+  const { itemById, markSeen } = useApp()
   const item = itemById(id)
   const [size, setSize] = useState(1)
 
@@ -37,8 +38,6 @@ export function Article({ id }: { id: string }) {
     )
   }
 
-  const next = today?.items.find((i) => i.id !== item.id && !seen[i.id])
-  const goNext = () => (next ? go(next.type === 'video' && next.videoId ? 'video' : 'article', next.id) : go())
   const site = hostOf(item.link)
   const minutes = readingMinutes(html ? html.replace(/<[^>]+>/g, ' ') : item.summary)
 
@@ -82,9 +81,7 @@ export function Article({ id }: { id: string }) {
         </a>
       </main>
 
-      <div className="sticky-bottom">
-        <button className="btn-primary" onClick={goNext}>{t('article.next')} {Icon.arrow}</button>
-      </div>
+      <NextBar currentId={item.id} />
     </div>
   )
 }

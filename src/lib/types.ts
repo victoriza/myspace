@@ -41,6 +41,8 @@ export interface FeedItem {
   image?: string
   author?: string
   videoId?: string
+  /** Length in minutes, when the source tells us (videos). */
+  minutes?: number
   isShort?: boolean
 }
 
@@ -50,7 +52,8 @@ export interface Settings {
   lang: Lang
   onboarded: boolean
   types: Record<ContentType, boolean>
-  perDay: 10 | 20 | 30
+  /** Daily time budget in minutes; the feed is filled up to this estimated reading/watching time. */
+  minutesPerDay: 10 | 20 | 30
   strictness: Strictness
   hidePolitics: boolean
   skipShorts: boolean

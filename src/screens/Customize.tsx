@@ -43,11 +43,11 @@ export function Customize() {
         <div className="card pad-card stack-tight">
           <Segmented
             label={t('customize.howMuch')}
-            value={settings.perDay}
-            onChange={(perDay) => change({ perDay })}
-            options={[10, 20, 30].map((n) => ({ value: n as 10 | 20 | 30, label: String(n) }))}
+            value={settings.minutesPerDay}
+            onChange={(minutesPerDay) => change({ minutesPerDay })}
+            options={[10, 20, 30].map((n) => ({ value: n as 10 | 20 | 30, label: t('customize.minutes', { count: n }) }))}
           />
-          <p className="muted small">{t('customize.items', { count: settings.perDay })} · {t('customize.ends')}</p>
+          <p className="muted small">{t('customize.timeHelp')}</p>
         </div>
 
         <div className="card list">

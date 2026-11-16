@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BottomNav, Icon, Switch, TypeTag } from '../components/ui'
+import { totalMinutes } from '../lib/feed'
 import { timeAgo } from '../lib/time'
 import type { ContentType, FeedItem } from '../lib/types'
 import { go } from '../router'
@@ -58,7 +59,7 @@ export function Feed({ welcome }: { welcome?: string | null }) {
       {items.length ? (
         <div className="status-row">
           <span className="muted small">
-            <strong className="ink">{t('feed.newCount', { count: newCount })}</strong> · {t('feed.seenCount', { count: inFilter.length - newCount })}
+            <strong className="ink">{t('feed.todayTime', { count: totalMinutes(items) })}</strong> · {t('feed.newCount', { count: newCount })}
           </span>
           <label className="inline-switch">
             {t('feed.hideSeen')}

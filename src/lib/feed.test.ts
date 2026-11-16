@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDailyFeed, orderMixed, pickDaily } from './feed'
+import { buildDailyFeed, estimateMinutes, orderMixed, pickDaily, totalMinutes } from './feed'
 import { parseFeed } from './parse'
 import { defaultSettings } from './storage'
 import type { FeedItem, Source } from './types'
@@ -12,11 +12,22 @@ function item(i: number, over: Partial<FeedItem> = {}): FeedItem {
 }
 
 describe('feed pipeline', () => {
-  it('caps items per source and respects the daily amount', () => {
-    const items = Array.from({ length: 30 }, (_, i) => item(i))
-    const picked = pickDaily(items, 20)
-    expect(picked.length).toBe(9) // 3 sources × 3 each
-    expect(pickDaily(items, 5).length).toBe(5)
+  it('caps items per source and fills the time budget', () => {
+    const items = Array.from({ length: 30 }, (_, i) => item(i)) // summary-only news ≈ 2 min each
+    expect(pickDaily(items, 30).length).toBe(9) // 3 sources × 3 each = 18 min
+    expect(totalMinutes(pickDaily(items, 10))).toBeLessThanOrEqual(10)
+    expect(pickDaily(items, 10).length).toBe(5)
+  })
+
+  it('allows at most 2 videos a day and skips items that do not fit', () => {
+    const videos = Array.from({ length: 5 }, (_, i) => item(i, { type: 'video', sourceId: 'v' + i }))
+    const long = item(10, { sourceId: 'long', content: '<p>' + 'word '.repeat(220 * 15) + '</p>' }) // 15 min read
+    const short = item(11, { sourceId: 'short' })
+    const picked = pickDaily([...videos, long, short], 30)
+    expect(picked.filter((i) => i.type === 'video').length).toBe(2) // 20 min
+    expect(picked.map((i) => i.id)).toContain('i11') // 2 min still fits
+    expect(picked.map((i) => i.id)).not.toContain('i10') // 15 min doesn't
+    expect(estimateMinutes(long)).toBe(15)
   })
 
   it('never puts two videos in a row when it can avoid it', () => {

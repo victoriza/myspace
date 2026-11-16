@@ -47,7 +47,7 @@ export function defaultSettings(): Settings {
     lang: detectLang(),
     onboarded: false,
     types: { news: true, video: true, newsletter: true, tech: false, picture: true },
-    perDay: 20,
+    minutesPerDay: 20,
     strictness: 'balanced',
     hidePolitics: true,
     skipShorts: true,
@@ -62,7 +62,8 @@ export function defaultSettings(): Settings {
 
 export function loadSettings(): Settings {
   const d = defaultSettings()
-  const s = read<Partial<Settings>>(K.settings, {})
+  const s = read<Partial<Settings> & { perDay?: unknown }>(K.settings, {})
+  delete s.perDay // v0 used an item count; now it's minutes
   return { ...d, ...s, types: { ...d.types, ...(s.types || {}) }, shortcuts: { ...d.shortcuts, ...(s.shortcuts || {}) } }
 }
 export const saveSettings = (s: Settings) => write(K.settings, s)

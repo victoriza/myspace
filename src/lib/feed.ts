@@ -12,6 +12,28 @@ const MAX_AGE: Record<FeedItem['type'], number> = {
   picture: 2 * DAY,
 }
 const PER_SOURCE_CAP = 3
+const MAX_VIDEOS_PER_DAY = 2
+/** Videos without a known length are assumed to take this long (YouTube RSS has no duration). */
+export const DEFAULT_VIDEO_MINUTES = 10
+const WORDS_PER_MINUTE = 220
+
+/** Estimated minutes an item takes if you open it. */
+export function estimateMinutes(item: FeedItem): number {
+  switch (item.type) {
+    case 'video':
+      return item.minutes ?? DEFAULT_VIDEO_MINUTES
+    case 'picture':
+      return 1
+    default: {
+      if (item.content) {
+        const words = item.content.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length
+        return Math.max(1, Math.round(words / WORDS_PER_MINUTE))
+      }
+      // Summary only: read the summary, maybe open the site.
+      return item.type === 'tech' ? 3 : 2
+    }
+  }
+}
 
 export interface FilterOutcome {
   kept: FeedItem[]
@@ -38,19 +60,35 @@ export function filterItems(items: FeedItem[], settings: Settings, seen: Record<
   return { kept, hidden }
 }
 
-/** Step 4: pick the daily amount — newest first, at most PER_SOURCE_CAP per source. */
-export function pickDaily(items: FeedItem[], perDay: number): FeedItem[] {
+/**
+ * Step 4: fill the daily time budget — newest first, at most PER_SOURCE_CAP per source,
+ * at most MAX_VIDEOS_PER_DAY videos, no video over 20 min. Items that don't fit are skipped
+ * so a shorter one can still use the remaining time.
+ */
+export function pickDaily(items: FeedItem[], budgetMinutes: number): FeedItem[] {
   const sorted = [...items].sort((a, b) => b.date - a.date)
   const perSource = new Map<string, number>()
   const picked: FeedItem[] = []
+  let used = 0
+  let videos = 0
   for (const item of sorted) {
     const n = perSource.get(item.sourceId) || 0
     if (n >= PER_SOURCE_CAP) continue
+    const mins = estimateMinutes(item)
+    if (item.type === 'video' && (videos >= MAX_VIDEOS_PER_DAY || mins > 20)) continue
+    if (used + mins > budgetMinutes) continue
     perSource.set(item.sourceId, n + 1)
     picked.push(item)
-    if (picked.length >= perDay) break
+    used += mins
+    if (item.type === 'video') videos++
+    if (used >= budgetMinutes) break
   }
   return picked
+}
+
+/** Total estimated minutes of a list of items. */
+export function totalMinutes(items: FeedItem[]): number {
+  return items.reduce((sum, i) => sum + estimateMinutes(i), 0)
 }
 
 /** Step 5: newest first, but never two videos in a row (and no two items of the same source in a row when avoidable). */
@@ -70,7 +108,7 @@ export function orderMixed(items: FeedItem[]): FeedItem[] {
 /** The whole pipeline: filter → pick → order. */
 export function buildDailyFeed(all: FeedItem[], settings: Settings, seen: Record<string, number>, now: number) {
   const { kept, hidden } = filterItems(all, settings, seen, now)
-  const picked = orderMixed(pickDaily(kept, settings.perDay))
+  const picked = orderMixed(pickDaily(kept, settings.minutesPerDay))
   return { items: picked, hidden }
 }
 

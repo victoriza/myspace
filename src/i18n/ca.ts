@@ -3,6 +3,15 @@ import type { es } from './es'
 export const ca: typeof es = {
   nav: { feed: 'Feed', customize: 'Personalitzar', more: 'Més', back: 'Tornar' },
   angles: { good: 'Bona notícia', progress: 'Progrés', solutions: 'Solució' },
+  remove: {
+    ask: 'No t’interessa? Treu {{name}}',
+    confirm: 'Vols treure {{name}} del teu feed?',
+    yes: 'Treure',
+    cancel: 'Cancel·lar',
+    removed: '{{name}} ja no apareixerà. La pots tornar a activar a Fonts.',
+    toast: 'Font eliminada',
+    undo: 'Desfer',
+  },
   types: { news: 'Notícies', video: 'Vídeos', newsletter: 'Butlletins', tech: 'Tecnologia', picture: 'Imatges', all: 'Tot' },
   typesDetail: {
     news: 'Bones notícies i solucions',

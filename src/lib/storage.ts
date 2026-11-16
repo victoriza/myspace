@@ -75,6 +75,11 @@ export function loadSettings(): Settings {
     merged.enabledSources = [...new Set([...s.enabledSources, ...added])]
     merged.knownSources = SUGGESTED_SOURCES.map((src) => src.id)
   }
+  // v0.2: "Hide channel" became "Remove source" — hidden channels are now simply switched-off sources.
+  if (merged.blockedChannels.length) {
+    merged.enabledSources = merged.enabledSources.filter((id) => !merged.blockedChannels.includes(id))
+    merged.blockedChannels = []
+  }
   return merged
 }
 export const saveSettings = (s: Settings) => write(K.settings, s)

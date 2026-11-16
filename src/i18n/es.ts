@@ -1,6 +1,15 @@
 export const es = {
   nav: { feed: 'Feed', customize: 'Personalizar', more: 'Más', back: 'Volver' },
   angles: { good: 'Buena noticia', progress: 'Progreso', solutions: 'Solución' },
+  remove: {
+    ask: '¿No te interesa? Quitar {{name}}',
+    confirm: '¿Quitar {{name}} de tu feed?',
+    yes: 'Quitar',
+    cancel: 'Cancelar',
+    removed: '{{name}} ya no aparecerá. Puedes volver a activarla en Fuentes.',
+    toast: 'Fuente quitada',
+    undo: 'Deshacer',
+  },
   types: { news: 'Noticias', video: 'Vídeos', newsletter: 'Newsletters', tech: 'Tecnología', picture: 'Imágenes', all: 'Todo' },
   typesDetail: {
     news: 'Buenas noticias y soluciones',

@@ -3,6 +3,15 @@ import type { es } from './es'
 export const en: typeof es = {
   nav: { feed: 'Feed', customize: 'Customize', more: 'More', back: 'Back' },
   angles: { good: 'Good news', progress: 'Progress', solutions: 'Solution' },
+  remove: {
+    ask: 'Not interested? Remove {{name}}',
+    confirm: 'Remove {{name}} from your feed?',
+    yes: 'Remove',
+    cancel: 'Cancel',
+    removed: "{{name}} won't appear any more. You can turn it back on in Sources.",
+    toast: 'Source removed',
+    undo: 'Undo',
+  },
   types: { news: 'News', video: 'Videos', newsletter: 'Newsletters', tech: 'Tech', picture: 'Pictures', all: 'All' },
   typesDetail: {
     news: 'Good news and solutions',

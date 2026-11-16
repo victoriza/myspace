@@ -32,6 +32,8 @@ interface AppState {
   markSeen: (id: string) => void
   refresh: (opts?: { force?: boolean }) => Promise<void>
   itemById: (id: string) => FeedItem | undefined
+  /** Turns a source off and drops its other items from today's feed. Returns an undo function. */
+  removeSource: (sourceId: string, keepItemId?: string) => () => void
   resetAll: () => void
 }
 
@@ -135,6 +137,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const itemById = useCallback((id: string) => today?.items.find((i) => i.id === id), [today])
 
+  const removeSource = useCallback((sourceId: string, keepItemId?: string) => {
+    const prevEnabled = settingsRef.current.enabledSources
+    const prevToday = loadToday()
+    updateSettings({ enabledSources: prevEnabled.filter((id) => id !== sourceId) })
+    if (prevToday) {
+      const next = { ...prevToday, items: prevToday.items.filter((i) => i.sourceId !== sourceId || i.id === keepItemId) }
+      saveToday(next)
+      setToday(next)
+    }
+    return () => {
+      updateSettings({ enabledSources: [...new Set([...settingsRef.current.enabledSources, sourceId])] })
+      if (prevToday) {
+        saveToday(prevToday)
+        setToday(prevToday)
+      }
+    }
+  }, [updateSettings])
+
   const resetAll = useCallback(() => {
     clearAll()
     clearToday()
@@ -147,8 +167,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo<AppState>(
-    () => ({ settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, resetAll }),
-    [settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, resetAll],
+    () => ({ settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, removeSource, resetAll }),
+    [settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, removeSource, resetAll],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

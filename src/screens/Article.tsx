@@ -5,6 +5,7 @@ import { hostOf, Icon, TypeTag } from '../components/ui'
 import { firstSentence } from '../lib/parse'
 import { readingMinutes, timeAgo } from '../lib/time'
 import { NextBar } from '../components/NextBar'
+import { RemoveSource } from '../components/RemoveSource'
 import { back, go } from '../router'
 import { useApp } from '../state'
 
@@ -79,6 +80,8 @@ export function Article({ id }: { id: string }) {
         <a className="btn-outline wide" href={item.link} target="_blank" rel="noopener noreferrer">
           {t('article.readOn', { site })} {Icon.external}
         </a>
+
+        <RemoveSource item={item} />
       </main>
 
       <NextBar currentId={item.id} />

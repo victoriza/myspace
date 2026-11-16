@@ -6,7 +6,7 @@ import { useApp } from '../state'
 
 export function Filters() {
   const { t } = useTranslation()
-  const { settings, updateSettings, refresh, sources } = useApp()
+  const { settings, updateSettings, refresh } = useApp()
   const [word, setWord] = useState('')
   const change = (patch: Parameters<typeof updateSettings>[0]) => {
     updateSettings(patch)
@@ -63,15 +63,6 @@ export function Filters() {
           </form>
         </section>
 
-        <section className="card pad-card stack-tight">
-          <h2 className="card-title">{t('filters.hiddenChannels')}</h2>
-          {settings.blockedChannels.length ? settings.blockedChannels.map((id) => (
-            <div key={id} className="row">
-              <span className="grow">{sources.find((s) => s.id === id)?.name || id}</span>
-              <button className="pill" onClick={() => change({ blockedChannels: settings.blockedChannels.filter((x) => x !== id) })}>{t('filters.show')}</button>
-            </div>
-          )) : <p className="muted small">{t('filters.none')}</p>}
-        </section>
       </main>
     </div>
   )

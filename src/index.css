@@ -287,3 +287,8 @@ h1, h2, h3, p { margin: 0; }
 .next-bar { align-items: stretch; }
 .next-title { text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; }
 .video-screen { min-height: 100dvh; display: flex; flex-direction: column; }
+
+/* Editorial angle label on news cards (good news · progress · solution) */
+.angle { font-size: 11px; font-weight: 600; letter-spacing: .02em; padding: 2px 7px; border-radius: 999px; background: #EEF0F6; color: #3B4A7A; white-space: nowrap; }
+.angle-progress { background: #E7F2EC; color: #2F6B4F; }
+.angle-solutions { background: #F6EEDF; color: #7A5A22; }

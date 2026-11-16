@@ -5,6 +5,7 @@ import { totalMinutes } from '../lib/feed'
 import { timeAgo } from '../lib/time'
 import type { ContentType, FeedItem } from '../lib/types'
 import { go } from '../router'
+import { sourceMeta } from '../lib/sources'
 import { useApp } from '../state'
 
 export function Feed({ welcome }: { welcome?: string | null }) {
@@ -164,6 +165,7 @@ function Card({ item, isSeen, cardRef }: { item: FeedItem; isSeen: boolean; card
   const { t, i18n } = useTranslation()
   const lang = i18n.language as 'es' | 'en' | 'ca'
   const open = () => go(item.type === 'video' && item.videoId ? 'video' : 'article', item.id)
+  const angle = sourceMeta(item.sourceId)?.angle
   const seenMark = isSeen ? (
     <span className="seen-mark">{Icon.check}{t('feed.seen')}</span>
   ) : (
@@ -172,6 +174,7 @@ function Card({ item, isSeen, cardRef }: { item: FeedItem; isSeen: boolean; card
   const meta = (
     <span className="meta">
       <TypeTag type={item.type} />
+      {angle ? <span className={`angle angle-${angle}`}>{t(`angles.${angle}`)}</span> : null}
       <span className="muted">{item.sourceName} · {timeAgo(item.date, lang)}</span>
       {seenMark}
     </span>

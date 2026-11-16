@@ -3,7 +3,7 @@ import { buildDailyFeed, estimateMinutes, nextItem, orderMixed, pickDaily, total
 import { parseFeed } from './parse'
 import { defaultEnabledSources } from './sources'
 import { defaultSettings } from './storage'
-import type { FeedItem, Source } from './types'
+import type { FeedItem, Source, Topic } from './types'
 
 const now = Date.UTC(2026, 10, 16, 10)
 const H = 60 * 60 * 1000
@@ -43,6 +43,16 @@ describe('feed pipeline', () => {
     expect(pictures.length).toBe(2)
     expect(new Set(pictures.map((p) => p.sourceId)).size).toBe(2)
     expect(totalMinutes(picked)).toBeLessThanOrEqual(10)
+  })
+
+  it('keeps any one topic under ~40% of the reading time', () => {
+    const science = Array.from({ length: 12 }, (_, i) => item(i, { sourceId: 'sci' + i }))
+    const progress = Array.from({ length: 12 }, (_, i) => item(20 + i, { sourceId: 'prog' + i }))
+    const topic = (i: FeedItem): Topic => (i.sourceId.startsWith('sci') ? 'science' : 'progress')
+    const picked = pickDaily([...science, ...progress], 20, topic)
+    const sciMinutes = totalMinutes(picked.filter((i) => topic(i) === 'science'))
+    expect(sciMinutes).toBeLessThanOrEqual(8)
+    expect(totalMinutes(picked)).toBe(16) // 8 + 8: the rest stays empty rather than all-science
   })
 
   it('never puts two videos in a row when it can avoid it', () => {

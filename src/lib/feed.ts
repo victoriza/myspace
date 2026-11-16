@@ -1,5 +1,6 @@
 import { isCalm, isPolitical } from './filters'
-import type { FeedItem, Settings } from './types'
+import { sourceMeta } from './sources'
+import type { FeedItem, Settings, Topic } from './types'
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -15,6 +16,16 @@ const PER_SOURCE_CAP = 3
 const MAX_VIDEOS_PER_DAY = 2
 /** Pictures are short (≈1 min) and calm: keep at least this many in every day. */
 export const MIN_PICTURES_PER_DAY = 2
+/** No subject (science, planet, progress…) may take more than this share of the day's reading time… */
+const TOPIC_SHARE = 0.4
+/** …but always allow at least this many minutes of it. */
+const TOPIC_MIN_MINUTES = 6
+
+/** Topic of an item, from its source. Videos and pictures have their own caps, so they don't count. */
+export function topicOf(item: FeedItem): Topic | undefined {
+  if (item.type === 'video' || item.type === 'picture') return undefined
+  return sourceMeta(item.sourceId)?.topic
+}
 /** Videos without a known length are assumed to take this long (YouTube RSS has no duration). */
 export const DEFAULT_VIDEO_MINUTES = 10
 const WORDS_PER_MINUTE = 220
@@ -63,11 +74,14 @@ export function filterItems(items: FeedItem[], settings: Settings, seen: Record<
 }
 
 /**
- * Step 4: fill the daily time budget — newest first, at most PER_SOURCE_CAP per source,
+ * Step 4: fill the daily time budget — at least MIN_PICTURES_PER_DAY pictures, then newest first,
+ * at most PER_SOURCE_CAP per source, no topic over TOPIC_SHARE of the time,
  * at most MAX_VIDEOS_PER_DAY videos, no video over 20 min. Items that don't fit are skipped
  * so a shorter one can still use the remaining time.
  */
-export function pickDaily(items: FeedItem[], budgetMinutes: number): FeedItem[] {
+export function pickDaily(items: FeedItem[], budgetMinutes: number, getTopic: (i: FeedItem) => Topic | undefined = topicOf): FeedItem[] {
+  const topicCap = Math.max(TOPIC_MIN_MINUTES, Math.round(budgetMinutes * TOPIC_SHARE))
+  const perTopic = new Map<Topic, number>()
   const sorted = [...items].sort((a, b) => b.date - a.date)
   const perSource = new Map<string, number>()
   const picked: FeedItem[] = []
@@ -92,6 +106,9 @@ export function pickDaily(items: FeedItem[], budgetMinutes: number): FeedItem[] 
     const mins = estimateMinutes(item)
     if (item.type === 'video' && (videos >= MAX_VIDEOS_PER_DAY || mins > 20)) continue
     if (used + mins > budgetMinutes) continue
+    const topic = getTopic(item)
+    if (topic && (perTopic.get(topic) || 0) + mins > topicCap) continue
+    if (topic) perTopic.set(topic, (perTopic.get(topic) || 0) + mins)
     perSource.set(item.sourceId, n + 1)
     picked.push(item)
     used += mins

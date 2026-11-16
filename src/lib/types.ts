@@ -5,6 +5,16 @@ export type ContentType = 'news' | 'video' | 'newsletter' | 'tech' | 'picture'
 
 export const CONTENT_TYPES: ContentType[] = ['news', 'video', 'newsletter', 'tech', 'picture']
 
+/** What a source mostly covers — used to keep each day balanced across subjects. */
+export type Topic = 'science' | 'planet' | 'tech' | 'progress' | 'society' | 'culture' | 'nature' | 'solutions'
+
+/**
+ * The editorial angle of a source:
+ * good = something good happened · progress = something is improving over time (with data) ·
+ * solutions = someone found a fix that works.
+ */
+export type Angle = 'good' | 'progress' | 'solutions'
+
 export type SourceKind = 'rss' | 'youtube' | 'wikipedia' | 'hn'
 
 export interface Source {
@@ -25,6 +35,10 @@ export interface Source {
   defaultOnFor?: Lang[]
   /** Added by the user (not from the suggested list). */
   custom?: boolean
+  topic?: Topic
+  angle?: Angle
+  /** Home page — if the feed URL stops working, the app looks for the feed here. */
+  site?: string
 }
 
 export interface FeedItem {
@@ -65,6 +79,8 @@ export interface Settings {
   enabledSources: string[]
   customSources: Source[]
   shortcuts: { instagram: boolean; tiktok: boolean }
+  /** Suggested sources the person has already been offered — new suggestions that are on by default get switched on once. */
+  knownSources: string[]
   /** Hour of the day when tomorrow's feed opens. */
   openHour: number
 }

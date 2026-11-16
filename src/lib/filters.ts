@@ -24,6 +24,23 @@ export const CLICKBAIT: string[] = [
   "ultima hora", 'indignant', 'vergonyos', 'esclata', 'xafarderia', 'xafarderies', 'carrega contra',
 ]
 
+// Science hype / overclaiming — ES / EN / CA. Strong phrases score like clickbait (2),
+// softer signals score 1, so "miracle cure… in mice" adds up and gets dropped.
+export const HYPE_STRONG: string[] = [
+  'miracle', 'miracle cure', 'changes everything', 'will change the world', 'game changer', 'game-changer', 'revolutionary',
+  'cure for all', 'scientists stunned', 'scientists baffled',
+  'milagro', 'milagroso', 'milagrosa', 'cura milagrosa', 'cura definitiva', 'lo cambia todo', 'cambia todo', 'cambiara el mundo',
+  'revolucionario', 'revolucionaria', 'cientificos atonitos',
+  'miracle', 'miraculos', 'cura definitiva', 'ho canvia tot', 'canviara el mon', 'revolucionari', 'revolucionaria',
+]
+export const HYPE_SOFT: string[] = [
+  'in mice', 'in rats', 'cure', 'cures', 'breakthrough', 'groundbreaking', 'historic',
+  'en ratones', 'en ratas', 'cura', 'curar', 'historico', 'sin precedentes',
+  'en ratolins', 'en rates', 'guarir', 'historic', 'sense precedents',
+]
+// Pseudoscience — always hidden (the feed is "optimism with evidence").
+export const PSEUDO: string[] = ['horoscope', 'astrology', 'horoscopo', 'astrologia', 'horoscop', 'tarot', 'homeopathy', 'homeopatia']
+
 // Politics vocabulary — ES / EN / CA (matched case- and accent-insensitively).
 export const POLITICS: string[] = [
   // Spanish
@@ -59,6 +76,9 @@ function wordRx(phrase: string, flags = 'u'): RegExp {
 }
 
 const CLICKBAIT_RX = [...new Set(CLICKBAIT.map(normalize))].map((p) => [p, wordRx(p)] as const)
+const HYPE_STRONG_RX = [...new Set(HYPE_STRONG.map(normalize))].map((p) => [p, wordRx(p)] as const)
+const HYPE_SOFT_RX = [...new Set(HYPE_SOFT.map(normalize))].map((p) => [p, wordRx(p)] as const)
+const PSEUDO_RX = [...new Set(PSEUDO.map(normalize))].map((p) => [p, wordRx(p)] as const)
 const POLITICS_RX = [...new Set(POLITICS.map(normalize))].map((p) => [p, wordRx(p)] as const)
 const PARTY_RX = PARTIES.map((p) => [p, new RegExp('(^|[^\\p{L}\\p{N}])' + escapeRx(p) + '(?=$|[^\\p{L}\\p{N}])', 'gu')] as const)
 
@@ -83,6 +103,23 @@ export function scoreText(title: string, summary = '', blockWords: string[] = []
     if (!word) continue
     const rx = wordRx(word)
     if (rx.test(nt) || rx.test(ns)) return { score: 99, reasons: ['blocked: ' + w.trim()], blocked: true }
+  }
+
+  for (const [p, rx] of PSEUDO_RX) {
+    if (rx.test(nt)) return { score: 99, reasons: ['pseudoscience: ' + p], blocked: true }
+  }
+
+  for (const [p, rx] of HYPE_STRONG_RX) {
+    if (rx.test(nt)) {
+      score += 2
+      reasons.push('hype: ' + p)
+    }
+  }
+  for (const [p, rx] of HYPE_SOFT_RX) {
+    if (rx.test(nt)) {
+      score += 1
+      reasons.push('hype: ' + p)
+    }
   }
 
   for (const [p, rx] of CLICKBAIT_RX) {

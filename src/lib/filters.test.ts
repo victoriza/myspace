@@ -35,4 +35,11 @@ describe('politics filter', () => {
     expect(isPolitical('A happy app for plants')).toBe(false)
     expect(isPolitical('Una nueva vacuna contra la malaria')).toBe(false)
   })
+
+  it('drops science hype and pseudoscience, keeps sober science', () => {
+    expect(isCalm('Miracle cure for diabetes works in mice', '', 'balanced')).toBe(false)
+    expect(isCalm('Un tratamiento milagroso cura el alzhéimer en ratones', '', 'balanced')).toBe(false)
+    expect(isCalm('New Alzheimer treatment slows memory loss in mice', '', 'balanced')).toBe(true)
+    expect(isCalm('Your weekly horoscope', '', 'relaxed')).toBe(false)
+  })
 })

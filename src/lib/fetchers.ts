@@ -104,8 +104,25 @@ export async function fetchSource(source: Source, lang: Lang): Promise<FeedItem[
       return parseFeed(await viaRelay(youtubeFeedUrl(id)), source)
     }
     default:
-      return parseFeed(await viaRelay(source.url!), source)
+      return fetchRss(source)
   }
+}
+
+/** RSS/Atom. If the feed URL breaks and the source has a home page, find the feed there (and remember it). */
+async function fetchRss(source: Source): Promise<FeedItem[]> {
+  const key = 'feed:' + source.id
+  const url = loadChannelIds()[key] || source.url!
+  try {
+    const items = parseFeed(await viaRelay(url), source)
+    if (items.length || !source.site) return items
+  } catch (e) {
+    if (!source.site) throw e
+  }
+  const found = await discoverSource(source.site!)
+  const feedUrl = found?.source.kind === 'rss' ? found.source.url : undefined
+  if (!feedUrl || feedUrl === url) throw new Error('feed not found')
+  saveChannelIds({ ...loadChannelIds(), [key]: feedUrl })
+  return parseFeed(await viaRelay(feedUrl), source)
 }
 
 export interface Discovered {

@@ -1,5 +1,6 @@
 export const es = {
   nav: { feed: 'Feed', customize: 'Personalizar', more: 'Más', back: 'Volver' },
+  angles: { good: 'Buena noticia', progress: 'Progreso', solutions: 'Solución' },
   types: { news: 'Noticias', video: 'Vídeos', newsletter: 'Newsletters', tech: 'Tecnología', picture: 'Imágenes', all: 'Todo' },
   typesDetail: {
     news: 'Buenas noticias y soluciones',

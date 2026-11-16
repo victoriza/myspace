@@ -1,4 +1,4 @@
-import { defaultEnabledSources } from './sources'
+import { defaultEnabledSources, SUGGESTED_SOURCES, V01_SOURCE_IDS } from './sources'
 import type { FeedItem, Lang, Settings } from './types'
 
 /** Small wrapper around localStorage that never throws (private mode, quota, etc.). */
@@ -57,6 +57,7 @@ export function defaultSettings(): Settings {
     enabledSources: defaultEnabledSources(lang),
     customSources: [],
     shortcuts: { instagram: true, tiktok: true },
+    knownSources: SUGGESTED_SOURCES.map((s) => s.id),
     openHour: 7,
   }
 }
@@ -65,7 +66,16 @@ export function loadSettings(): Settings {
   const d = defaultSettings()
   const s = read<Partial<Settings> & { perDay?: unknown }>(K.settings, {})
   delete s.perDay // v0 used an item count; now it's minutes
-  return { ...d, ...s, types: { ...d.types, ...(s.types || {}) }, shortcuts: { ...d.shortcuts, ...(s.shortcuts || {}) } }
+  const merged: Settings = { ...d, ...s, types: { ...d.types, ...(s.types || {}) }, shortcuts: { ...d.shortcuts, ...(s.shortcuts || {}) } }
+  // New suggested sources that are on by default: switch them on once for existing users.
+  if (s.enabledSources) {
+    const known = new Set(s.knownSources ?? V01_SOURCE_IDS)
+    const defaults = new Set(defaultEnabledSources(merged.lang))
+    const added = SUGGESTED_SOURCES.filter((src) => !known.has(src.id) && defaults.has(src.id)).map((src) => src.id)
+    merged.enabledSources = [...new Set([...s.enabledSources, ...added])]
+    merged.knownSources = SUGGESTED_SOURCES.map((src) => src.id)
+  }
+  return merged
 }
 export const saveSettings = (s: Settings) => write(K.settings, s)
 

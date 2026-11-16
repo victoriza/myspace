@@ -2,6 +2,7 @@ import type { es } from './es'
 
 export const ca: typeof es = {
   nav: { feed: 'Feed', customize: 'Personalitzar', more: 'Més', back: 'Tornar' },
+  angles: { good: 'Bona notícia', progress: 'Progrés', solutions: 'Solució' },
   types: { news: 'Notícies', video: 'Vídeos', newsletter: 'Butlletins', tech: 'Tecnologia', picture: 'Imatges', all: 'Tot' },
   typesDetail: {
     news: 'Bones notícies i solucions',

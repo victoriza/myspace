@@ -2,6 +2,7 @@ import type { es } from './es'
 
 export const en: typeof es = {
   nav: { feed: 'Feed', customize: 'Customize', more: 'More', back: 'Back' },
+  angles: { good: 'Good news', progress: 'Progress', solutions: 'Solution' },
   types: { news: 'News', video: 'Videos', newsletter: 'Newsletters', tech: 'Tech', picture: 'Pictures', all: 'All' },
   typesDetail: {
     news: 'Good news and solutions',

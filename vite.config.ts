@@ -26,7 +26,7 @@ export default defineConfig({
     react(),
     relayDev(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Space Feed',

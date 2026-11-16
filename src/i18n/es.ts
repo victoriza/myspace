@@ -17,6 +17,13 @@ export const es = {
     caps: 'MAYÚSCULAS',
     kind: { politics: 'Política', blocked: 'Palabra bloqueada', pseudo: 'Pseudociencia', hype: 'Exageración', clickbait: 'Clickbait', style: 'Estilo sensacionalista' },
   },
+  update: {
+    available: 'Nueva versión disponible',
+    apply: 'Actualizar',
+    later: 'Más tarde',
+    whatsNew: 'Novedades en la v{{version}}',
+    gotIt: 'Entendido',
+  },
   types: { news: 'Noticias', video: 'Vídeos', newsletter: 'Newsletters', tech: 'Tecnología', picture: 'Imágenes', all: 'Todo' },
   typesDetail: {
     news: 'Buenas noticias y soluciones',

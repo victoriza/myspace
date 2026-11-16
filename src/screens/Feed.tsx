@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BottomNav, Icon, Switch, TypeTag } from '../components/ui'
+import { UpdateBar, WhatsNew } from '../components/Updates'
 import { totalMinutes } from '../lib/feed'
 import { timeAgo } from '../lib/time'
 import type { ContentType, FeedItem } from '../lib/types'
@@ -45,6 +46,7 @@ export function Feed({ welcome }: { welcome?: string | null }) {
         </div>
       </header>
 
+      <UpdateBar />
       {welcome ? <div className="notice">{welcome}</div> : null}
 
       {presentTypes.length > 1 ? (
@@ -72,6 +74,7 @@ export function Feed({ welcome }: { welcome?: string | null }) {
       {failedSources.length ? <p className="muted small pad-x">{t('feed.refreshError')}</p> : null}
 
       <main className="stack">
+        <WhatsNew />
         {fresh.map((item) => <Card key={item.id} item={item} isSeen={!!seen[item.id]} cardRef={register(item.id, !!seen[item.id])} />)}
         {!hideSeen && old.length ? (
           <>

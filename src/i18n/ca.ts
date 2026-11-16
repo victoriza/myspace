@@ -19,6 +19,13 @@ export const ca: typeof es = {
     caps: 'MAJÚSCULES',
     kind: { politics: 'Política', blocked: 'Paraula bloquejada', pseudo: 'Pseudociència', hype: 'Exageració', clickbait: 'Clickbait', style: 'Estil sensacionalista' },
   },
+  update: {
+    available: 'Nova versió disponible',
+    apply: 'Actualitzar',
+    later: 'Més tard',
+    whatsNew: 'Novetats de la v{{version}}',
+    gotIt: 'Entesos',
+  },
   types: { news: 'Notícies', video: 'Vídeos', newsletter: 'Butlletins', tech: 'Tecnologia', picture: 'Imatges', all: 'Tot' },
   typesDetail: {
     news: 'Bones notícies i solucions',

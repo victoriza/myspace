@@ -1,13 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { Header, Icon } from '../components/ui'
+import { APP_VERSION } from '../lib/changelog'
+import { useUpdate } from '../lib/update'
 import { go } from '../router'
 
 /** Victor's LinkedIn profile ("Say hi on LinkedIn"). */
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/victoriza/'
-export const APP_VERSION = '0.3.0'
+export { APP_VERSION } from '../lib/changelog'
 
 export function About() {
   const { t } = useTranslation()
+  const update = useUpdate()
   return (
     <div className="screen">
       <Header title={t('about.title')} />
@@ -17,6 +20,7 @@ export function About() {
           <strong>Space Feed</strong>
           <span className="muted small">{t('about.tagline')}</span>
           <span className="muted small">{t('about.version', { version: APP_VERSION })}</span>
+          {update.available ? <button className="pill" onClick={update.apply}>{t('update.apply')}</button> : null}
         </div>
 
         <h2 className="section-label">{t('about.author')}</h2>

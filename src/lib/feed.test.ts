@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildDailyFeed, estimateMinutes, nextItem, orderMixed, pickDaily, totalMinutes } from './feed'
+import { compareVersions, notesSince } from './changelog'
 import { findDurationSeconds, parseFeed } from './parse'
 import { defaultEnabledSources } from './sources'
 import { defaultSettings } from './storage'
@@ -73,6 +74,13 @@ describe('feed pipeline', () => {
     expect(findDurationSeconds('..."videoDetails":{"videoId":"x","lengthSeconds":"754","keywords"...')).toBe(754)
     expect(findDurationSeconds('<meta itemprop="duration" content="PT1H2M3S">')).toBe(3723)
     expect(findDurationSeconds('<html></html>')).toBeNull()
+  })
+
+  it('shows what is new only for versions newer than the last one seen', () => {
+    expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
+    expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.4.0'])
+    expect(notesSince('0.4.0')).toEqual([])
   })
 
   it('never puts two videos in a row when it can avoid it', () => {

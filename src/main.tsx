@@ -1,12 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { registerSW } from 'virtual:pwa-register'
 import App from './App.tsx'
 import './i18n'
 import './index.css'
+import { APP_VERSION } from './lib/changelog'
+import { startVersionTracking } from './lib/storage'
+import { initUpdates } from './lib/update'
 import { AppProvider } from './state.tsx'
 
-registerSW({ immediate: true })
+startVersionTracking(APP_VERSION)
+initUpdates()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

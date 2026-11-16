@@ -31,6 +31,7 @@ const K = {
   channels: 'sf.channels.v1',
   socialSession: 'sf.social.v1',
   durations: 'sf.durations.v1',
+  lastVersion: 'sf.version.v1',
 }
 
 export function detectLang(): Lang {
@@ -139,4 +140,14 @@ export const loadDurations = () => read<Record<string, number>>(K.durations, {})
 export function saveDurations(d: Record<string, number>) {
   const entries = Object.entries(d)
   write(K.durations, Object.fromEntries(entries.slice(Math.max(0, entries.length - 300))))
+}
+
+/** Version whose "What's new" the person has already seen. */
+export const loadLastVersion = () => read<string | null>(K.lastVersion, null)
+export const saveLastVersion = (v: string) => write(K.lastVersion, v)
+
+/** First run ever (nothing saved yet): there's nothing "new" to show, so start at the current version. */
+export function startVersionTracking(current: string) {
+  if (read<string | null>(K.lastVersion, null)) return
+  if (read<unknown>(K.settings, null) === null) saveLastVersion(current)
 }

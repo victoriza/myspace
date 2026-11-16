@@ -19,6 +19,13 @@ export const en: typeof es = {
     caps: 'ALL CAPS',
     kind: { politics: 'Politics', blocked: 'Blocked word', pseudo: 'Pseudoscience', hype: 'Hype', clickbait: 'Clickbait', style: 'Sensational style' },
   },
+  update: {
+    available: 'New version available',
+    apply: 'Update',
+    later: 'Later',
+    whatsNew: 'What’s new in v{{version}}',
+    gotIt: 'Got it',
+  },
   types: { news: 'News', video: 'Videos', newsletter: 'Newsletters', tech: 'Tech', picture: 'Pictures', all: 'All' },
   typesDetail: {
     news: 'Good news and solutions',

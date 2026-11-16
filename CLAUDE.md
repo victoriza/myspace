@@ -19,4 +19,10 @@
 - `src/lib/fetchers.ts` — fetching through the relay, feed discovery, YouTube video lengths.
 - `api/relay.ts` — same-origin only, rate-limited per IP, 3 MB cap, no private hosts.
 - `src/state.tsx` — app state and refresh; `src/screens/` — screens.
+- `src/lib/update.ts` + `src/components/Updates.tsx` — new-version notice (service worker in "prompt" mode) and the one-time "What's new" card.
 - Tests: `npm test` (Vitest). Build: `npm run build`.
+
+## Releasing a version
+1. Bump `version` in `package.json`.
+2. Add an entry at the top of `CHANGELOG` in `src/lib/changelog.ts` (2–3 short lines in ES/EN/CA). Its version is what About shows.
+3. Push. People see "Nueva versión disponible · Actualizar" on the feed, then the "Novedades" card once.

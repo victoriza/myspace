@@ -79,8 +79,8 @@ describe('feed pipeline', () => {
   it('shows what is new only for versions newer than the last one seen', () => {
     expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
     expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
-    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.6.0', '0.5.1'])
-    expect(notesSince('0.6.0')).toEqual([])
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.7.0', '0.6.0'])
+    expect(notesSince('0.7.0')).toEqual([])
   })
 
   it('leaves out switched-off interests (videogames start off)', () => {

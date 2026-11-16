@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BottomNav, Icon, Switch, TypeTag } from '../components/ui'
 import { UpdateBar, WhatsNew } from '../components/Updates'
 import { Greeting, LivingLogo, MiniLoader } from '../components/Cosy'
+import { SkyBackdrop } from '../components/Sky'
+import { luminance, sceneAt, skyColorAt } from '../lib/sky'
 import { totalMinutes } from '../lib/feed'
 import { timeAgo } from '../lib/time'
 import type { ContentType, FeedItem } from '../lib/types'
@@ -42,9 +44,28 @@ export function Feed() {
   const allDone = items.length > 0 && allFresh.length === 0
 
   const { register, endRef } = useSeenOnScroll(markSeen)
+  const { heroRef, chipsRef, sentinelRef, horizon, stuck, chipsH } = useHorizon(`${presentTypes.length > 1}-${items.length > 0}`)
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 5 * 60 * 1000)
+    return () => clearInterval(id)
+  }, [])
+  const scene = sceneAt(now, horizon)
+  const L = scene.look
+  const seaLight = luminance(L.sea) < 0.3
+  const skyVars = {
+    '--hero-ink': scene.lightText ? '#FFFFFF' : '#172036',
+    '--hero-sub': scene.lightText ? 'rgba(255,255,255,0.82)' : '#4A5468',
+    '--sea-ink': seaLight ? 'rgba(255,255,255,0.86)' : '#4A5468',
+    '--sea-strong': seaLight ? '#FFFFFF' : '#172036',
+    '--card-bg': L.card,
+    '--stuck-bg': `linear-gradient(180deg, ${skyColorAt(L, 0, horizon + 20)}, ${skyColorAt(L, chipsH, horizon + 20)})`,
+  } as CSSProperties
 
   return (
-    <div className="screen with-nav">
+    <div className={`screen with-nav sky-home${scene.lightText ? ' sky-light' : ''}${scene.darkGround ? ' sky-dark' : ''}`} style={skyVars}>
+      <SkyBackdrop scene={scene} horizon={horizon} />
+      <div ref={heroRef} className="sky-hero">
       <header className="feed-header">
         <div className="brand">
           <LivingLogo />
@@ -54,9 +75,11 @@ export function Feed() {
 
       <Greeting />
       <UpdateBar />
+      </div>
 
+      <div ref={sentinelRef} className="chips-sentinel" aria-hidden="true" />
       {presentTypes.length > 1 ? (
-        <div className="chips" role="radiogroup" aria-label={t('types.all')}>
+        <div ref={chipsRef} className={`chips sky-chips${stuck ? ' stuck' : ''}`} role="radiogroup" aria-label={t('types.all')}>
           {(['all', ...presentTypes] as const).map((type) => (
             <button key={type} role="radio" aria-checked={filter === type} className={`chip ${filter === type ? 'on' : ''}`} onClick={() => setFilter(type)}>
               {t(`types.${type}`)}
@@ -117,6 +140,46 @@ export function Feed() {
       <BottomNav active="feed" />
     </div>
   )
+}
+
+/**
+ * Where the horizon goes: just under the chips (or the greeting when there are no chips).
+ * Also tells when the chips have stuck to the top, so they get a sky-coloured background.
+ */
+function useHorizon(layoutKey: string) {
+  const heroRef = useRef<HTMLDivElement | null>(null)
+  const chipsRef = useRef<HTMLDivElement | null>(null)
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const [horizon, setHorizon] = useState(200)
+  const [chipsH, setChipsH] = useState(52)
+  const [stuck, setStuck] = useState(false)
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const hero = heroRef.current
+      if (!hero) return
+      const chips = chipsRef.current
+      const bottom = chips ? chips.offsetTop + chips.offsetHeight : hero.offsetTop + hero.offsetHeight
+      setHorizon(Math.round(bottom + 4))
+      if (chips) setChipsH(chips.offsetHeight)
+    }
+    measure()
+    if (typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(measure)
+    if (heroRef.current) ro.observe(heroRef.current)
+    if (chipsRef.current) ro.observe(chipsRef.current)
+    return () => ro.disconnect()
+  }, [layoutKey])
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting && e.boundingClientRect.top < 0))
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  return { heroRef, chipsRef, sentinelRef, horizon, stuck, chipsH }
 }
 
 /**

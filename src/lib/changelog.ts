@@ -6,6 +6,23 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.7.0',
+    notes: {
+      es: [
+        'Tu inicio tiene cielo: amanecer, día, atardecer y noche según la hora, con sol, luna, nubes y estrellas.',
+        'Al hacer scroll, las tarjetas pasan por encima del cielo; las olas se mueven despacio en el horizonte.',
+      ],
+      en: [
+        'Your home has a sky now: dawn, day, sunset and night by the hour, with sun, moon, clouds and stars.',
+        'As you scroll, the cards slide over the sky; the waves drift slowly along the horizon.',
+      ],
+      ca: [
+        'El teu inici té cel: alba, dia, posta i nit segons l’hora, amb sol, lluna, núvols i estrelles.',
+        'En fer scroll, les targetes passen per sobre del cel; les onades es mouen a poc a poc a l’horitzó.',
+      ],
+    },
+  },
+  {
     version: '0.6.0',
     notes: {
       es: [

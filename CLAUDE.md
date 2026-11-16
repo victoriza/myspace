@@ -21,6 +21,7 @@
 - `api/relay.ts` — same-origin only, rate-limited per IP, 3 MB cap, no private hosts.
 - `src/state.tsx` — app state and refresh; `src/screens/` — screens.
 - `src/lib/daytime.ts` + `src/components/Cosy.tsx` — time-of-day greeting, living logo, warm palette (`<html data-daypart>`), mini loader.
+- `src/lib/sky.ts` + `src/components/Sky.tsx` — the home sky: four looks (dawn, day, sunset, night) blended by the hour, sun arc / moon / stars / clouds, waves on the horizon (measured under the chips in `Feed.tsx`), light text and dark page at night.
 - `src/lib/update.ts` + `src/components/Updates.tsx` — new-version notice (service worker in "prompt" mode) and the one-time "What's new" card.
 - Tests: `npm test` (Vitest). Build: `npm run build`.
 

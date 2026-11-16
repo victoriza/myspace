@@ -56,7 +56,6 @@ npm run build      # production build in dist/
 
 ## Before launch
 
-- Put your LinkedIn URL in `src/screens/Why.tsx` (`LINKEDIN_URL`).
 - Check these feeds on the first deploy (marked ⚠️ in the sources doc): Fix The News, En Positivo,
   Hay luz al final del túnel, and the YouTube handles (`@kurzgesagt_es`, `@3blue1brown`, `@curiosamente`, `@QuantumFracture`).
   The Sources screen shows "Not responding" for any feed that fails.

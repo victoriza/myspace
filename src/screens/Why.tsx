@@ -3,8 +3,8 @@ import { Icon, LangSwitch } from '../components/ui'
 import { back, go } from '../router'
 import { useApp } from '../state'
 
-/** Replace with Victor's real profile URL. */
-export const LINKEDIN_URL = 'https://www.linkedin.com/'
+/** Victor's LinkedIn profile ("Say hi on LinkedIn"). */
+export const LINKEDIN_URL = 'https://www.linkedin.com/in/victoriza/'
 
 const DOTS = [['#E6EEF8', '#1F4F8A'], ['#DDEFE8', '#1F5A45'], ['#FBEEDC', '#7A4A12'], ['#EFE9F8', '#5A3E8C'], ['#F7E3DC', '#7A2E17'], ['#E1EEF0', '#1F5A63']]
 

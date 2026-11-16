@@ -1,5 +1,5 @@
 import { explain, politicalMatch, scoreText, threshold, type HiddenKind } from './filters'
-import { sourceMeta } from './sources'
+import { interestOf, sourceMeta } from './sources'
 import type { FeedItem, Settings, Topic } from './types'
 
 const DAY = 24 * 60 * 60 * 1000
@@ -61,7 +61,9 @@ export function filterItems(items: FeedItem[], settings: Settings, seen: Record<
   for (const item of items) {
     if (seenIds.has(item.id)) continue
     seenIds.add(item.id)
+    const topic = sourceMeta(item.sourceId)?.topic
     if (!settings.types[item.type]) hidden.push({ item, reason: 'type' })
+    else if (topic && settings.topicsOff?.includes(interestOf(topic))) hidden.push({ item, reason: 'type' })
     else if (now - item.date > MAX_AGE[item.type]) hidden.push({ item, reason: 'old' })
     else if (seen[item.id]) hidden.push({ item, reason: 'seen' })
     else if (item.type === 'video' && settings.skipShorts && item.isShort) hidden.push({ item, reason: 'short' })

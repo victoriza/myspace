@@ -15,7 +15,7 @@ export const es = {
     help: 'Lo que el filtro ha apartado hoy. Si algo no debía ocultarse, muéstralo y aparecerá al final de tu feed.',
     none: 'Nada ocultado hoy.',
     caps: 'MAYÚSCULAS',
-    kind: { politics: 'Política', blocked: 'Palabra bloqueada', pseudo: 'Pseudociencia', hype: 'Exageración', clickbait: 'Clickbait', style: 'Estilo sensacionalista' },
+    kind: { guide: 'Guía de juego', politics: 'Política', blocked: 'Palabra bloqueada', pseudo: 'Pseudociencia', hype: 'Exageración', clickbait: 'Clickbait', style: 'Estilo sensacionalista' },
   },
   update: {
     available: 'Nueva versión disponible',
@@ -31,6 +31,11 @@ export const es = {
     morningLine: 'Tu rato tranquilo de hoy, con calma.',
     afternoonLine: 'Una pausa tranquila para la tarde.',
     eveningLine: 'Algo bueno para cerrar el día.',
+  },
+  interests: {
+    title: 'Intereses',
+    help: 'Al activar o desactivar un tema, se activan o desactivan sus fuentes sugeridas. Ningún tema ocupa más del 40 % de tu tiempo.',
+    science: 'Ciencia', planet: 'Planeta', progress: 'Progreso', society: 'Sociedad', solutions: 'Soluciones', culture: 'Cultura', tech: 'Tecnología', games: 'Videojuegos',
   },
   types: { news: 'Noticias', video: 'Vídeos', newsletter: 'Newsletters', tech: 'Tecnología', picture: 'Imágenes', all: 'Todo' },
   typesDetail: {
@@ -121,7 +126,7 @@ export const es = {
     whatsIn: 'Qué hay en tu feed',
     howMuch: 'Cuánto tiempo al día',
     minutes: '{{count}} min',
-    timeHelp: 'Calculado si abres cada cosa: lectura estimada y unos 10 min por vídeo (máx. 2 al día). Después, el feed se acaba.',
+    timeHelp: 'Calculado si abres cada cosa: lectura estimada y la duración real de cada vídeo (máx. 2 al día). Después, el feed se acaba.',
     filters: 'Filtro tranquilo y política',
     sources: 'Fuentes',
     why: 'Por qué existe Space Feed',

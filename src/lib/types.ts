@@ -6,7 +6,10 @@ export type ContentType = 'news' | 'video' | 'newsletter' | 'tech' | 'picture'
 export const CONTENT_TYPES: ContentType[] = ['news', 'video', 'newsletter', 'tech', 'picture']
 
 /** What a source mostly covers — used to keep each day balanced across subjects. */
-export type Topic = 'science' | 'planet' | 'tech' | 'progress' | 'society' | 'culture' | 'nature' | 'solutions'
+export type Topic = 'science' | 'planet' | 'tech' | 'progress' | 'society' | 'culture' | 'nature' | 'solutions' | 'games'
+
+/** Subjects a person can switch on/off in Customize → Interests (nature is shown under science). */
+export const INTERESTS: Topic[] = ['science', 'planet', 'progress', 'society', 'solutions', 'culture', 'tech', 'games']
 
 /**
  * The editorial angle of a source:
@@ -39,6 +42,8 @@ export interface Source {
   angle?: Angle
   /** Home page — if the feed URL stops working, the app looks for the feed here. */
   site?: string
+  /** Switched on when its topic is switched on in Interests (for topics that start off, like games). */
+  onWithTopic?: boolean
 }
 
 export interface FeedItem {
@@ -78,6 +83,8 @@ export interface Settings {
   /** Ids of sources the person follows. */
   enabledSources: string[]
   customSources: Source[]
+  /** Interests switched off in Customize (their sources are off and their items are left out). */
+  topicsOff: Topic[]
   /** Suggested sources the person has already been offered — new suggestions that are on by default get switched on once. */
   knownSources: string[]
   /** Hour of the day when tomorrow's feed opens. */

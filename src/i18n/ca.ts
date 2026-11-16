@@ -17,7 +17,7 @@ export const ca: typeof es = {
     help: 'El que el filtre ha apartat avui. Si alguna cosa no s’havia d’amagar, mostra-la i apareixerà al final del teu feed.',
     none: 'Res amagat avui.',
     caps: 'MAJÚSCULES',
-    kind: { politics: 'Política', blocked: 'Paraula bloquejada', pseudo: 'Pseudociència', hype: 'Exageració', clickbait: 'Clickbait', style: 'Estil sensacionalista' },
+    kind: { guide: 'Guia de joc', politics: 'Política', blocked: 'Paraula bloquejada', pseudo: 'Pseudociència', hype: 'Exageració', clickbait: 'Clickbait', style: 'Estil sensacionalista' },
   },
   update: {
     available: 'Nova versió disponible',
@@ -33,6 +33,11 @@ export const ca: typeof es = {
     morningLine: 'La teva estona tranquil·la d’avui, sense presses.',
     afternoonLine: 'Una pausa tranquil·la per a la tarda.',
     eveningLine: 'Alguna cosa bona per tancar el dia.',
+  },
+  interests: {
+    title: 'Interessos',
+    help: 'En activar o desactivar un tema, s’activen o desactiven les seves fonts suggerides. Cap tema ocupa més del 40 % del teu temps.',
+    science: 'Ciència', planet: 'Planeta', progress: 'Progrés', society: 'Societat', solutions: 'Solucions', culture: 'Cultura', tech: 'Tecnologia', games: 'Videojocs',
   },
   types: { news: 'Notícies', video: 'Vídeos', newsletter: 'Butlletins', tech: 'Tecnologia', picture: 'Imatges', all: 'Tot' },
   typesDetail: {
@@ -123,7 +128,7 @@ export const ca: typeof es = {
     whatsIn: 'Què hi ha al teu feed',
     howMuch: 'Quant temps al dia',
     minutes: '{{count}} min',
-    timeHelp: 'Calculat com si obrissis cada cosa: lectura estimada i uns 10 min per vídeo (màx. 2 al dia). Després, el feed s’acaba.',
+    timeHelp: 'Calculat com si obrissis cada cosa: lectura estimada i la durada real de cada vídeo (màx. 2 al dia). Després, el feed s’acaba.',
     filters: 'Filtre tranquil i política',
     sources: 'Fonts',
     why: 'Per què existeix Space Feed',

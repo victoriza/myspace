@@ -17,7 +17,7 @@ export const en: typeof es = {
     help: 'What the filter set aside today. If something shouldn’t be hidden, show it and it will appear at the end of your feed.',
     none: 'Nothing hidden today.',
     caps: 'ALL CAPS',
-    kind: { politics: 'Politics', blocked: 'Blocked word', pseudo: 'Pseudoscience', hype: 'Hype', clickbait: 'Clickbait', style: 'Sensational style' },
+    kind: { guide: 'Game guide', politics: 'Politics', blocked: 'Blocked word', pseudo: 'Pseudoscience', hype: 'Hype', clickbait: 'Clickbait', style: 'Sensational style' },
   },
   update: {
     available: 'New version available',
@@ -33,6 +33,11 @@ export const en: typeof es = {
     morningLine: 'Your calm moment for today, no rush.',
     afternoonLine: 'A quiet break for the afternoon.',
     eveningLine: 'Something good to end the day.',
+  },
+  interests: {
+    title: 'Interests',
+    help: 'Switching a topic on or off switches its suggested sources too. No topic takes more than 40% of your time.',
+    science: 'Science', planet: 'Planet', progress: 'Progress', society: 'Society', solutions: 'Solutions', culture: 'Culture', tech: 'Technology', games: 'Videogames',
   },
   types: { news: 'News', video: 'Videos', newsletter: 'Newsletters', tech: 'Tech', picture: 'Pictures', all: 'All' },
   typesDetail: {
@@ -123,7 +128,7 @@ export const en: typeof es = {
     whatsIn: 'What’s in your feed',
     howMuch: 'How much time per day',
     minutes: '{{count}} min',
-    timeHelp: 'Counted as if you open everything: estimated reading time and about 10 min per video (max 2 a day). Then the feed ends.',
+    timeHelp: 'Counted as if you open everything: estimated reading time and each video’s real length (max 2 a day). Then the feed ends.',
     filters: 'Calm filter & politics',
     sources: 'Sources',
     why: 'Why Space Feed exists',

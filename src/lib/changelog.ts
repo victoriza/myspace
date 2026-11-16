@@ -6,6 +6,23 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.6.0',
+    notes: {
+      es: [
+        'Nuevo en Personalizar: “Intereses”. Activa o desactiva temas como Ciencia, Planeta o Cultura.',
+        'Nuevo tema: Videojuegos (desactivado al principio): cómo se hacen los juegos y su cultura, sin guías ni polémicas.',
+      ],
+      en: [
+        'New in Customize: “Interests”. Switch topics like Science, Planet or Culture on or off.',
+        'New topic: Videogames (off to start): how games are made and their culture, no guides or drama.',
+      ],
+      ca: [
+        'Nou a Personalitzar: “Interessos”. Activa o desactiva temes com Ciència, Planeta o Cultura.',
+        'Nou tema: Videojocs (desactivat al principi): com es fan els jocs i la seva cultura, sense guies ni polèmiques.',
+      ],
+    },
+  },
+  {
     version: '0.5.1',
     notes: {
       es: ['Hemos quitado los accesos a Instagram y TikTok: Space Feed es tu rato tranquilo, sin puertas a feeds infinitos.'],

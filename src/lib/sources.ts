@@ -1,4 +1,4 @@
-import type { Lang, Source } from './types'
+import type { Lang, Source, Topic } from './types'
 
 /**
  * Suggested sources shown on first open and in "Browse suggested".
@@ -37,14 +37,21 @@ export const SUGGESTED_SOURCES: Source[] = [
   { id: 'marginalian', name: 'The Marginalian', lang: 'en', type: 'newsletter', kind: 'rss', url: 'https://www.themarginalian.org/feed/', topic: 'culture' },
 
   // YouTube channels
-  { id: 'yt-kurzgesagt', name: 'Kurzgesagt', lang: 'en', type: 'video', kind: 'youtube', channelId: 'UCsXVk37bltHxD1rDPwtNM8Q', defaultOn: true },
-  { id: 'yt-kurzgesagt-es', name: 'En Pocas Palabras', lang: 'es', type: 'video', kind: 'youtube', handle: '@kurzgesagt_es', defaultOn: true },
-  { id: 'yt-3b1b', name: '3Blue1Brown', lang: 'en', type: 'video', kind: 'youtube', handle: '@3blue1brown' },
-  { id: 'yt-curiosamente', name: 'CuriosaMente', lang: 'es', type: 'video', kind: 'youtube', handle: '@curiosamente', defaultOn: true },
-  { id: 'yt-quantumfracture', name: 'QuantumFracture', lang: 'es', type: 'video', kind: 'youtube', handle: '@QuantumFracture' },
-  { id: 'yt-cdeciencia', name: 'CdeCiencia', lang: 'es', type: 'video', kind: 'youtube', handle: '@CdeCiencia' },
-  { id: 'yt-teded', name: 'TED-Ed', lang: 'en', type: 'video', kind: 'youtube', handle: '@TEDEd' },
-  { id: 'yt-minutephysics', name: 'MinutePhysics', lang: 'en', type: 'video', kind: 'youtube', handle: '@minutephysics' },
+  { id: 'yt-kurzgesagt', name: 'Kurzgesagt', lang: 'en', type: 'video', kind: 'youtube', channelId: 'UCsXVk37bltHxD1rDPwtNM8Q', topic: 'science', defaultOn: true },
+  { id: 'yt-kurzgesagt-es', name: 'En Pocas Palabras', lang: 'es', type: 'video', kind: 'youtube', handle: '@kurzgesagt_es', topic: 'science', defaultOn: true },
+  { id: 'yt-3b1b', name: '3Blue1Brown', lang: 'en', type: 'video', kind: 'youtube', handle: '@3blue1brown', topic: 'science' },
+  { id: 'yt-curiosamente', name: 'CuriosaMente', lang: 'es', type: 'video', kind: 'youtube', handle: '@curiosamente', topic: 'science', defaultOn: true },
+  { id: 'yt-quantumfracture', name: 'QuantumFracture', lang: 'es', type: 'video', kind: 'youtube', handle: '@QuantumFracture', topic: 'science' },
+  { id: 'yt-cdeciencia', name: 'CdeCiencia', lang: 'es', type: 'video', kind: 'youtube', handle: '@CdeCiencia', topic: 'science' },
+  { id: 'yt-teded', name: 'TED-Ed', lang: 'en', type: 'video', kind: 'youtube', handle: '@TEDEd', topic: 'culture' },
+  { id: 'yt-minutephysics', name: 'MinutePhysics', lang: 'en', type: 'video', kind: 'youtube', handle: '@minutephysics', topic: 'science' },
+  // Videogames — off until "Videojuegos" is switched on in Interests. Craft and culture, not hype.
+  { id: 'game-developer', name: 'Game Developer', lang: 'en', type: 'news', kind: 'rss', url: 'https://www.gamedeveloper.com/rss.xml', site: 'https://www.gamedeveloper.com/', topic: 'games', onWithTopic: true },
+  { id: 'devuego', name: 'DeVuego', lang: 'es', type: 'news', kind: 'rss', url: 'https://www.devuego.es/blog/feed/', site: 'https://www.devuego.es/blog/', topic: 'games', onWithTopic: true },
+  { id: 'anaitgames', name: 'AnaitGames', lang: 'es', type: 'news', kind: 'rss', url: 'https://www.anaitgames.com/feed', site: 'https://www.anaitgames.com/', topic: 'games', onWithTopic: true },
+  { id: 'yt-gmtk', name: "Game Maker's Toolkit", lang: 'en', type: 'video', kind: 'youtube', handle: '@GMTK', topic: 'games', onWithTopic: true },
+  { id: 'yt-noclip', name: 'Noclip', lang: 'en', type: 'video', kind: 'youtube', handle: '@NoclipDocs', topic: 'games', onWithTopic: true },
+  { id: 'yt-dayoscript', name: 'Dayoscript', lang: 'es', type: 'video', kind: 'youtube', handle: '@Dayoscript', topic: 'games', onWithTopic: true },
 ]
 
 /**
@@ -64,3 +71,17 @@ export function defaultEnabledSources(lang?: Lang): string[] {
 export function allSources(custom: Source[]): Source[] {
   return [...SUGGESTED_SOURCES, ...custom]
 }
+
+/** Suggested sources that come on when a topic is switched on (its default ones for this language). */
+export function sourcesForTopic(topic: Topic, lang: Lang): string[] {
+  return SUGGESTED_SOURCES.filter((s) => s.topic === topic && (s.onWithTopic || s.defaultOn || s.defaultOnFor?.includes(lang))).map((s) => s.id)
+}
+
+/** All suggested sources of a topic. */
+export const allSourcesOfTopic = (topic: Topic): string[] => SUGGESTED_SOURCES.filter((s) => s.topic === topic).map((s) => s.id)
+
+/** Interest a topic belongs to (nature is part of science in Interests). */
+export const interestOf = (topic: Topic): Topic => (topic === 'nature' ? 'science' : topic)
+
+/** Topics covered by an interest. */
+export const topicsOfInterest = (interest: Topic): Topic[] => (interest === 'science' ? ['science', 'nature'] : [interest])

@@ -352,3 +352,8 @@ h1, h2, h3, p { margin: 0; }
   .done-sky-warm { display: none; }
   .done-stars span { opacity: .8; }
 }
+
+/* Customize → Interests */
+.interest-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip.interest { display: inline-flex; align-items: center; gap: 6px; }
+.chip.interest svg { width: 13px; height: 13px; }

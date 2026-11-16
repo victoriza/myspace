@@ -42,4 +42,12 @@ describe('politics filter', () => {
     expect(isCalm('New Alzheimer treatment slows memory loss in mice', '', 'balanced')).toBe(true)
     expect(isCalm('Your weekly horoscope', '', 'relaxed')).toBe(false)
   })
+
+  it('hides game guides and gaming drama, keeps game craft stories', () => {
+    expect(isCalm('Where to find every shrine in Zelda: all locations', '', 'balanced')).toBe(false)
+    expect(isCalm('Cómo conseguir la espada maestra', '', 'balanced')).toBe(false)
+    expect(isCalm('Console war: fans are furious after leak', '', 'balanced')).toBe(false)
+    expect(isCalm('How a tiny team built a cosy farming game', '', 'balanced')).toBe(true)
+    expect(isCalm('A guide to designing accessible controls', '', 'balanced')).toBe(true)
+  })
 })

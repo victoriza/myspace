@@ -15,8 +15,8 @@
 
 ## Code map
 - `src/lib/feed.ts` — daily pipeline: filter → pick (time budget, ≥2 pictures, per-source/topic/video caps) → order; also the "Hidden today" list.
-- `src/lib/filters.ts` — calm filter (clickbait, hype, pseudoscience) and politics filter.
-- `src/lib/sources.ts` — suggested sources with topic and angle.
+- `src/lib/filters.ts` — calm filter (clickbait, hype, game guides, pseudoscience) and politics filter.
+- `src/lib/sources.ts` — suggested sources with topic and angle; Interests (Customize) switch topics and their sources (`topicsOff`; videogames start off).
 - `src/lib/fetchers.ts` — fetching through the relay, feed discovery, YouTube video lengths.
 - `api/relay.ts` — same-origin only, rate-limited per IP, 3 MB cap, no private hosts.
 - `src/state.tsx` — app state and refresh; `src/screens/` — screens.

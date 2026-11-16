@@ -13,12 +13,12 @@ export const CLICKBAIT: string[] = [
   'insane', 'crazy', 'reacts', 'reacting', 'reaction', 'prank', 'the truth about', 'not clickbait', 'breaking',
   'omg', 'wtf', 'rant', 'callout', 'called out', 'responds to', 'humiliated', 'worst ever', 'gone viral', 'leaked',
   'caught on camera', 'must watch', 'what happened next', 'unbelievable', 'clapback', 'roasted', 'controversy',
-  'controversial', 'lawsuit', 'snapped', 'gossip',
+  'controversial', 'lawsuit', 'snapped', 'gossip', 'leak', 'leaks', 'console war', 'console wars', 'review bomb', 'review bombed', 'review bombing', 'outrage', 'backlash', 'fans are furious', 'fans are angry',
   // Spanish
   'polemica', 'escandalo', 'brutal', 'zasca', 'humilla', 'humillado', 'destroza', 'destrozado', 'no vas a creer',
   'no creeras', 'la verdad sobre', 'funa', 'funado', 'reaccion', 'reacciono', 'salseo', 'bronca', 'pelea', 'traicion',
   'impactante', 'ultima hora', 'expuesto', 'se acabo', 'lo que paso', 'indignante', 'vergonzoso', 'estalla',
-  'cotilleo', 'filtrado', 'carga contra', 'arremete',
+  'cotilleo', 'filtrado', 'carga contra', 'arremete', 'filtracion', 'guerra de consolas', 'indignacion', 'los fans estallan',
   // Catalan
   'polemica', 'escandol', 'increible', 'brutal', 'no et creuras', 'la veritat sobre', 'baralla', 'traicio', 'impactant',
   "ultima hora", 'indignant', 'vergonyos', 'esclata', 'xafarderia', 'xafarderies', 'carrega contra',
@@ -38,6 +38,14 @@ export const HYPE_SOFT: string[] = [
   'en ratones', 'en ratas', 'cura', 'curar', 'historico', 'sin precedentes',
   'en ratolins', 'en rates', 'guarir', 'historic', 'sense precedents',
 ]
+// Game guides and walkthroughs flood feeds on big releases — not what this feed is for.
+export const GUIDE_STRONG: string[] = [
+  'walkthrough', 'how to beat', 'how to find', 'how to get', 'how to unlock', 'how to solve', 'where to find', 'all locations', 'best build', 'best loadout', 'tier list',
+  'donde encontrar', 'como conseguir', 'como derrotar', 'como desbloquear', 'todas las ubicaciones', 'mejor build',
+  'on trobar', 'com aconseguir', 'com derrotar', 'com desbloquejar',
+]
+export const GUIDE_SOFT: string[] = ['guide', 'guia']
+
 // Pseudoscience — always hidden (the feed is "optimism with evidence").
 export const PSEUDO: string[] = ['horoscope', 'astrology', 'horoscopo', 'astrologia', 'horoscop', 'tarot', 'homeopathy', 'homeopatia']
 
@@ -78,6 +86,8 @@ function wordRx(phrase: string, flags = 'u'): RegExp {
 const CLICKBAIT_RX = [...new Set(CLICKBAIT.map(normalize))].map((p) => [p, wordRx(p)] as const)
 const HYPE_STRONG_RX = [...new Set(HYPE_STRONG.map(normalize))].map((p) => [p, wordRx(p)] as const)
 const HYPE_SOFT_RX = [...new Set(HYPE_SOFT.map(normalize))].map((p) => [p, wordRx(p)] as const)
+const GUIDE_STRONG_RX = [...new Set(GUIDE_STRONG.map(normalize))].map((p) => [p, wordRx(p)] as const)
+const GUIDE_SOFT_RX = [...new Set(GUIDE_SOFT.map(normalize))].map((p) => [p, wordRx(p)] as const)
 const PSEUDO_RX = [...new Set(PSEUDO.map(normalize))].map((p) => [p, wordRx(p)] as const)
 const POLITICS_RX = [...new Set(POLITICS.map(normalize))].map((p) => [p, wordRx(p)] as const)
 const PARTY_RX = PARTIES.map((p) => [p, new RegExp('(^|[^\\p{L}\\p{N}])' + escapeRx(p) + '(?=$|[^\\p{L}\\p{N}])', 'gu')] as const)
@@ -107,6 +117,19 @@ export function scoreText(title: string, summary = '', blockWords: string[] = []
 
   for (const [p, rx] of PSEUDO_RX) {
     if (rx.test(nt)) return { score: 99, reasons: ['pseudoscience: ' + p], blocked: true }
+  }
+
+  for (const [p, rx] of GUIDE_STRONG_RX) {
+    if (rx.test(nt)) {
+      score += 3
+      reasons.push('guide: ' + p)
+    }
+  }
+  for (const [p, rx] of GUIDE_SOFT_RX) {
+    if (rx.test(nt)) {
+      score += 1
+      reasons.push('guide: ' + p)
+    }
   }
 
   for (const [p, rx] of HYPE_STRONG_RX) {
@@ -164,7 +187,7 @@ export function threshold(s: Strictness): number {
   return s === 'strict' ? 2 : s === 'relaxed' ? 4 : 3
 }
 
-export type HiddenKind = 'politics' | 'blocked' | 'pseudo' | 'hype' | 'clickbait' | 'style'
+export type HiddenKind = 'politics' | 'blocked' | 'pseudo' | 'hype' | 'clickbait' | 'guide' | 'style'
 
 /** Why a calm-filter score was too high, as a kind and the main word (for "Hidden today"). */
 export function explain(reasons: string[]): { kind: HiddenKind; word?: string } {
@@ -174,10 +197,13 @@ export function explain(reasons: string[]): { kind: HiddenKind; word?: string } 
   const pseudo = first('pseudoscience: ')
   if (pseudo) return { kind: 'pseudo', word: pseudo }
   const style = new Set(['ALL CAPS', 'caps words', '!!!', 'alarm emoji', 'emoji spam', 'cliffhanger'])
-  const click = reasons.find((r) => !r.startsWith('hype: ') && !style.has(r))
+  const guide = first('guide: ')
+  if (guide && reasons.some((r) => r.startsWith('guide: ') && !['guide', 'guia'].includes(r.slice(7)))) return { kind: 'guide', word: guide }
+  const click = reasons.find((r) => !r.startsWith('hype: ') && !r.startsWith('guide: ') && !style.has(r))
   if (click) return { kind: 'clickbait', word: click }
   const hype = first('hype: ')
   if (hype) return { kind: 'hype', word: hype }
+  if (guide) return { kind: 'guide', word: guide }
   return { kind: 'style', word: reasons[0] }
 }
 

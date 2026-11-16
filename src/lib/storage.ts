@@ -58,6 +58,7 @@ export function defaultSettings(): Settings {
     blockedChannels: [],
     enabledSources: defaultEnabledSources(lang),
     customSources: [],
+    topicsOff: ['games'],
     knownSources: SUGGESTED_SOURCES.map((s) => s.id),
     openHour: 7,
   }

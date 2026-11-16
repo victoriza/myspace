@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { BottomNav, Icon, LangSwitch, Segmented, Switch } from '../components/ui'
-import { CONTENT_TYPES } from '../lib/types'
+import { allSourcesOfTopic, sourcesForTopic, topicsOfInterest } from '../lib/sources'
+import { CONTENT_TYPES, INTERESTS, type Topic } from '../lib/types'
 import { go } from '../router'
 import { useApp } from '../state'
 
@@ -11,6 +12,18 @@ export function Customize() {
     updateSettings(patch)
     // Rebuild today's feed with the new choices (uses cached sources, no extra waiting).
     setTimeout(() => void refresh({ force: true }), 0)
+  }
+  const topicsOff = settings.topicsOff ?? []
+  // Switching an interest on/off switches its suggested sources together.
+  const toggleInterest = (interest: Topic) => {
+    const topics = topicsOfInterest(interest)
+    if (topicsOff.includes(interest)) {
+      const add = topics.flatMap((tp) => sourcesForTopic(tp, settings.lang))
+      change({ topicsOff: topicsOff.filter((x) => x !== interest), enabledSources: [...new Set([...settings.enabledSources, ...add])] })
+    } else {
+      const remove = new Set(topics.flatMap(allSourcesOfTopic))
+      change({ topicsOff: [...topicsOff, interest], enabledSources: settings.enabledSources.filter((id) => !remove.has(id)) })
+    }
   }
 
   return (
@@ -37,6 +50,22 @@ export function Customize() {
               />
             </div>
           ))}
+        </div>
+
+        <h2 className="section-label">{t('interests.title')}</h2>
+        <div className="card pad-card stack-tight">
+          <div className="interest-chips" role="group" aria-label={t('interests.title')}>
+            {INTERESTS.map((topic) => {
+              const on = !topicsOff.includes(topic)
+              return (
+                <button key={topic} className={`chip interest ${on ? 'on' : ''}`} aria-pressed={on} onClick={() => toggleInterest(topic)}>
+                  {on ? Icon.check : null}
+                  {t(`interests.${topic}`)}
+                </button>
+              )
+            })}
+          </div>
+          <p className="muted small">{t('interests.help')}</p>
         </div>
 
         <h2 className="section-label">{t('customize.howMuch')}</h2>

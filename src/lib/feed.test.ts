@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildDailyFeed, estimateMinutes, nextItem, orderMixed, pickDaily, totalMinutes } from './feed'
 import { compareVersions, notesSince } from './changelog'
 import { findDurationSeconds, parseFeed } from './parse'
-import { defaultEnabledSources } from './sources'
+import { defaultEnabledSources, sourcesForTopic } from './sources'
 import { defaultSettings } from './storage'
 import type { FeedItem, Source, Topic } from './types'
 
@@ -79,8 +79,21 @@ describe('feed pipeline', () => {
   it('shows what is new only for versions newer than the last one seen', () => {
     expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
     expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
-    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.5.1', '0.5.0'])
-    expect(notesSince('0.5.1')).toEqual([])
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.6.0', '0.5.1'])
+    expect(notesSince('0.6.0')).toEqual([])
+  })
+
+  it('leaves out switched-off interests (videogames start off)', () => {
+    const s = defaultSettings()
+    expect(s.topicsOff).toEqual(['games'])
+    const items = [item(1, { sourceId: 'game-developer', title: 'How a tiny team built a cosy farming game' }), item(2, { sourceId: 'owid' })]
+    expect(buildDailyFeed(items, s, {}, now).items.map((i) => i.id)).toEqual(['i2'])
+    const on = { ...s, topicsOff: [] }
+    expect(buildDailyFeed(items, on, {}, now).items.map((i) => i.id).sort()).toEqual(['i1', 'i2'])
+  })
+
+  it('switching videogames on brings its sources', () => {
+    expect(sourcesForTopic('games', 'es')).toEqual(['game-developer', 'devuego', 'anaitgames', 'yt-gmtk', 'yt-noclip', 'yt-dayoscript'])
   })
 
   it('never puts two videos in a row when it can avoid it', () => {

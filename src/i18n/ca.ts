@@ -142,6 +142,7 @@ export const ca: typeof es = {
     notFoundText: 'Alguns butlletins només arriben per correu. Pots crear una adreça privada gratuïta a Kill the Newsletter, subscriure-t’hi i enganxar aquí el feed que et dona.',
     openKtn: 'Obrir Kill the Newsletter',
   },
+  about: { title: 'Sobre', tagline: 'Un feed tranquil que s’acaba.', version: 'Versió {{version}}', author: 'Qui el fa' },
   more: {
     title: 'Més',
     subtitle: 'Sense compte. Mai no es publica res en nom teu.',

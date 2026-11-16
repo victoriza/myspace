@@ -140,6 +140,7 @@ export const es = {
     notFoundText: 'Algunas newsletters solo llegan por email. Puedes crear una dirección privada gratuita en Kill the Newsletter, suscribirte con ella y pegar aquí el feed que te da.',
     openKtn: 'Abrir Kill the Newsletter',
   },
+  about: { title: 'Acerca de', tagline: 'Un feed tranquilo que se acaba.', version: 'Versión {{version}}', author: 'Quién lo hace' },
   more: {
     title: 'Más',
     subtitle: 'Sin cuenta. Nunca se publica nada en tu nombre.',

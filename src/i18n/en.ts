@@ -142,6 +142,7 @@ export const en: typeof es = {
     notFoundText: 'Some newsletters only arrive by email. Create a free private address at Kill the Newsletter, subscribe with it, and paste the feed it gives you here.',
     openKtn: 'Open Kill the Newsletter',
   },
+  about: { title: 'About', tagline: 'A calm feed that ends.', version: 'Version {{version}}', author: 'Who makes it' },
   more: {
     title: 'More',
     subtitle: 'No account needed. Nothing is ever posted for you.',

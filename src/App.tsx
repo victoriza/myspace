@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { loadSocial, saveSocial } from './lib/storage'
 import { go, useRoute } from './router'
+import { About } from './screens/About'
 import { AddSource } from './screens/AddSource'
 import { Article } from './screens/Article'
 import { Customize } from './screens/Customize'
@@ -71,6 +72,8 @@ export default function App() {
   switch (page) {
     case 'why':
       return <Why />
+    case 'about':
+      return <About />
     case 'suggested':
       return <Suggested />
     case 'article':

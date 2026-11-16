@@ -193,6 +193,8 @@ h1, h2, h3, p { margin: 0; }
 .why-bottom { padding: 0 12px 24px; display: flex; flex-direction: column; gap: 8px; }
 .author { padding: 10px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
 .author .btn-outline { flex: 1 1 100%; }
+.about-hero { padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.about-hero strong { font-family: 'Space Grotesk', sans-serif; font-size: 20px; }
 .author-text { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 13px; }
 .author-text strong { font-size: 14px; }
 .avatar { width: 40px; height: 40px; flex: none; border-radius: 20px; background: var(--sun); color: var(--navy); display: flex; align-items: center; justify-content: center; font-weight: 700; }
@@ -264,3 +266,20 @@ h1, h2, h3, p { margin: 0; }
 @keyframes sf-dot { 0%, 80%, 100% { opacity: .3; transform: scale(.8) } 40% { opacity: 1; transform: scale(1) } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 .end-sentinel { height: 1px; }
+
+/* Onboarding "Why": compact, with the Start button always visible */
+.why { min-height: 100dvh; }
+.why-hero { padding: 10px 12px 16px; }
+.why-hero h1 { font-size: 26px; padding-top: 2px; }
+.why-hero p { font-size: 14px; padding-top: 8px; }
+.why-list { gap: 6px; padding: 10px 12px 4px; flex: 1; }
+.principle { padding: 9px 12px; }
+.why-bottom { position: sticky; bottom: 0; padding: 14px 12px calc(16px + var(--safe-bottom)); background: linear-gradient(to top, var(--ground) 72%, rgba(246,245,241,0)); }
+@media (max-height: 760px) {
+  .why-hero h1 { font-size: 23px; }
+  .why-hero p { font-size: 13.5px; line-height: 1.4; }
+  .why-sun { width: 100px; height: 100px; top: 40px; }
+  .principle { padding: 7px 12px; }
+  .principle > span:last-child { font-size: 12.5px; line-height: 1.35; }
+  .principle strong { font-size: 14px; }
+}

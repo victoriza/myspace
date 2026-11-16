@@ -4,9 +4,6 @@ import { defaultEnabledSources } from '../lib/sources'
 import { back, go } from '../router'
 import { useApp } from '../state'
 
-/** Victor's LinkedIn profile ("Say hi on LinkedIn"). */
-export const LINKEDIN_URL = 'https://www.linkedin.com/in/victoriza/'
-
 const DOTS = [['#E6EEF8', '#1F4F8A'], ['#DDEFE8', '#1F5A45'], ['#FBEEDC', '#7A4A12'], ['#EFE9F8', '#5A3E8C'], ['#F7E3DC', '#7A2E17'], ['#E1EEF0', '#1F5A63']]
 
 export function Why() {
@@ -46,19 +43,11 @@ export function Why() {
         ))}
       </main>
 
-      <div className="why-bottom">
-        <div className="card author">
-          <span className="avatar" aria-hidden="true">V</span>
-          <span className="author-text">
-            <strong>{t('why.madeBy')}</strong>
-            <span className="muted">{t('why.feedback')}</span>
-          </span>
-          <a className="btn-outline" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">{t('why.sayHi')}</a>
-        </div>
-        {firstRun ? (
+      {firstRun ? (
+        <div className="why-bottom">
           <button className="btn-primary" onClick={() => go('suggested')}>{t('why.start')}</button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </div>
   )
 }

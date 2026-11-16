@@ -31,6 +31,20 @@ describe('feed pipeline', () => {
     expect(estimateMinutes(long)).toBe(15)
   })
 
+  it('keeps at least 2 pictures a day, one per source first, even when newer news fills the budget', () => {
+    const news = Array.from({ length: 30 }, (_, i) => item(i, { sourceId: 'n' + (i % 10) }))
+    const pics = [
+      item(40, { type: 'picture', sourceId: 'wiki' }),
+      item(41, { type: 'picture', sourceId: 'wiki' }),
+      item(42, { type: 'picture', sourceId: 'apod' }),
+    ]
+    const picked = pickDaily([...news, ...pics], 10)
+    const pictures = picked.filter((i) => i.type === 'picture')
+    expect(pictures.length).toBe(2)
+    expect(new Set(pictures.map((p) => p.sourceId)).size).toBe(2)
+    expect(totalMinutes(picked)).toBeLessThanOrEqual(10)
+  })
+
   it('never puts two videos in a row when it can avoid it', () => {
     const items = [
       item(1, { type: 'video', sourceId: 'v1' }),

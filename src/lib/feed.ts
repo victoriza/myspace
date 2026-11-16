@@ -13,6 +13,8 @@ const MAX_AGE: Record<FeedItem['type'], number> = {
 }
 const PER_SOURCE_CAP = 3
 const MAX_VIDEOS_PER_DAY = 2
+/** Pictures are short (≈1 min) and calm: keep at least this many in every day. */
+export const MIN_PICTURES_PER_DAY = 2
 /** Videos without a known length are assumed to take this long (YouTube RSS has no duration). */
 export const DEFAULT_VIDEO_MINUTES = 10
 const WORDS_PER_MINUTE = 220
@@ -71,7 +73,20 @@ export function pickDaily(items: FeedItem[], budgetMinutes: number): FeedItem[] 
   const picked: FeedItem[] = []
   let used = 0
   let videos = 0
+  // Reserve pictures first (newest, one per source before repeating a source) so newer news can't push them out.
+  const pictures = sorted.filter((i) => i.type === 'picture')
+  const firstPerSource = pictures.filter((p, i) => pictures.findIndex((q) => q.sourceId === p.sourceId) === i)
+  const reserve = [...firstPerSource, ...pictures.filter((p) => !firstPerSource.includes(p))]
+  for (const item of reserve) {
+    if (picked.length >= MIN_PICTURES_PER_DAY) break
+    const mins = estimateMinutes(item)
+    if (used + mins > budgetMinutes) break
+    perSource.set(item.sourceId, (perSource.get(item.sourceId) || 0) + 1)
+    picked.push(item)
+    used += mins
+  }
   for (const item of sorted) {
+    if (picked.includes(item)) continue
     const n = perSource.get(item.sourceId) || 0
     if (n >= PER_SOURCE_CAP) continue
     const mins = estimateMinutes(item)

@@ -36,28 +36,34 @@ export async function resolveChannelId(source: Source): Promise<string | null> {
   return id
 }
 
+/** Wikipedia picture of the day — today's and yesterday's, so there are always pictures to pick from. */
 async function fetchWikipediaPicture(source: Source, lang: Lang): Promise<FeedItem[]> {
-  const d = new Date()
+  const days = [0, 1].map((back) => new Date(Date.now() - back * 24 * 60 * 60 * 1000))
+  const results = await Promise.allSettled(days.map((d) => fetchWikipediaDay(source, lang, d)))
+  const items = results.flatMap((r) => (r.status === 'fulfilled' && r.value ? [r.value] : []))
+  if (!items.length && results[0].status === 'rejected') throw results[0].reason
+  return items
+}
+
+async function fetchWikipediaDay(source: Source, lang: Lang, d: Date): Promise<FeedItem | null> {
   const path = `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}`
   const res = await withTimeout(`https://${lang}.wikipedia.org/api/rest_v1/feed/featured/${path}`)
   if (!res.ok) throw new Error('wikipedia ' + res.status)
   const data = await res.json()
   const img = data.image
-  if (!img) return []
+  if (!img) return null
   const title = (img.description?.text as string | undefined)?.replace(/<[^>]+>/g, '').trim() || (img.title as string).replace(/^File:/, '').replace(/\.[a-z]+$/i, '')
-  return [
-    {
-      id: `${source.id}::${path}`,
-      sourceId: source.id,
-      sourceName: source.name,
-      type: 'picture',
-      title: title.length > 160 ? title.slice(0, 157) + '…' : title,
-      link: img.file_page || `https://commons.wikimedia.org/wiki/${encodeURIComponent(img.title)}`,
-      date: Date.now(),
-      summary: img.artist?.text ? `© ${String(img.artist.text).replace(/<[^>]+>/g, '').trim()}` : '',
-      image: img.thumbnail?.source || img.image?.source,
-    },
-  ]
+  return {
+    id: `${source.id}::${path}`,
+    sourceId: source.id,
+    sourceName: source.name,
+    type: 'picture',
+    title: title.length > 160 ? title.slice(0, 157) + '…' : title,
+    link: img.file_page || `https://commons.wikimedia.org/wiki/${encodeURIComponent(img.title)}`,
+    date: Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 6),
+    summary: img.artist?.text ? `© ${String(img.artist.text).replace(/<[^>]+>/g, '').trim()}` : '',
+    image: img.thumbnail?.source || img.image?.source,
+  }
 }
 
 async function fetchHackerNews(source: Source): Promise<FeedItem[]> {

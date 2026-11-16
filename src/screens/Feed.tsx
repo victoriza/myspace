@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BottomNav, Icon, Switch, TypeTag } from '../components/ui'
 import { UpdateBar, WhatsNew } from '../components/Updates'
+import { Greeting, LivingLogo, MiniLoader } from '../components/Cosy'
 import { totalMinutes } from '../lib/feed'
 import { timeAgo } from '../lib/time'
 import type { ContentType, FeedItem } from '../lib/types'
@@ -17,6 +18,19 @@ export function Feed({ welcome }: { welcome?: string | null }) {
   // Grouping (new vs "seen earlier") uses what was seen when the feed opened,
   // so cards don't jump around while you scroll and they get marked as seen.
   const [seenAtOpen] = useState(() => ({ ...seen }))
+  // Cards rise in gently on the first open of the day only.
+  const [arrive] = useState(() => {
+    const day = today?.day
+    if (!day) return false
+    let last: string | null = null
+    try {
+      last = localStorage.getItem('sf.arrived.v1')
+      localStorage.setItem('sf.arrived.v1', day)
+    } catch {
+      /* private mode */
+    }
+    return last !== day
+  })
 
   const items = useMemo(() => today?.items ?? [], [today])
   const presentTypes = useMemo(() => [...new Set(items.map((i) => i.type))], [items])
@@ -33,7 +47,7 @@ export function Feed({ welcome }: { welcome?: string | null }) {
     <div className="screen with-nav">
       <header className="feed-header">
         <div className="brand">
-          {Icon.logo}
+          <LivingLogo />
           <h1>Space Feed</h1>
         </div>
         <div className="social-buttons">
@@ -46,6 +60,7 @@ export function Feed({ welcome }: { welcome?: string | null }) {
         </div>
       </header>
 
+      <Greeting />
       <UpdateBar />
       {welcome ? <div className="notice">{welcome}</div> : null}
 
@@ -71,15 +86,18 @@ export function Feed({ welcome }: { welcome?: string | null }) {
         </div>
       ) : null}
 
+      {loading && today ? <MiniLoader /> : null}
       {failedSources.length ? <p className="muted small pad-x">{t('feed.refreshError')}</p> : null}
 
       <main className="stack">
         <WhatsNew />
-        {fresh.map((item) => <Card key={item.id} item={item} isSeen={!!seen[item.id]} cardRef={register(item.id, !!seen[item.id])} />)}
+        {fresh.map((item, i) => (
+          <Card key={item.id} item={item} isSeen={!!seen[item.id]} cardRef={register(item.id, !!seen[item.id])} arriveIndex={arrive ? i : undefined} />
+        ))}
         {!hideSeen && old.length ? (
           <>
             <div className="divider"><span />{t('feed.seenEarlier')}<span /></div>
-            {old.map((item) => <Card key={item.id} item={item} isSeen />)}
+            {old.map((item) => <Card key={item.id} item={item} isSeen seenBefore />)}
           </>
         ) : null}
 
@@ -164,13 +182,15 @@ function useSeenOnScroll(markSeen: (id: string) => void) {
   return { register, endRef }
 }
 
-function Card({ item, isSeen, cardRef }: { item: FeedItem; isSeen: boolean; cardRef?: (el: HTMLElement | null) => void }) {
+function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedItem; isSeen: boolean; cardRef?: (el: HTMLElement | null) => void; arriveIndex?: number; seenBefore?: boolean }) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language as 'es' | 'en' | 'ca'
   const open = () => go(item.type === 'video' && item.videoId ? 'video' : 'article', item.id)
   const angle = sourceMeta(item.sourceId)?.angle
+  const arriveCls = arriveIndex !== undefined ? ' arrive' : ''
+  const arriveStyle = arriveIndex !== undefined ? { animationDelay: `${Math.min(arriveIndex, 7) * 70}ms` } : undefined
   const seenMark = isSeen ? (
-    <span className="seen-mark">{Icon.check}{t('feed.seen')}</span>
+    <span className={`seen-mark${seenBefore ? '' : ' just-seen'}`}>{Icon.check}{t('feed.seen')}</span>
   ) : (
     <span className="new-dot" aria-label="new" />
   )
@@ -192,7 +212,7 @@ function Card({ item, isSeen, cardRef }: { item: FeedItem; isSeen: boolean; card
       </span>
     )
     return (
-      <button ref={cardRef} className={`card video-card ${isSeen ? 'is-seen' : ''}`} onClick={open}>
+      <button ref={cardRef} className={`card video-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
         <span className="thumb" style={item.image ? { backgroundImage: `url("${item.image}")` } : undefined}>
           <span className="play">{Icon.play}</span>
         </span>
@@ -206,7 +226,7 @@ function Card({ item, isSeen, cardRef }: { item: FeedItem; isSeen: boolean; card
 
   if (item.type === 'picture') {
     return (
-      <button ref={cardRef} className={`card picture-card ${isSeen ? 'is-seen' : ''}`} onClick={open}>
+      <button ref={cardRef} className={`card picture-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
         <span className="picture" style={item.image ? { backgroundImage: `url("${item.image}")` } : undefined} />
         <span className="picture-text">
           {meta}
@@ -217,7 +237,7 @@ function Card({ item, isSeen, cardRef }: { item: FeedItem; isSeen: boolean; card
   }
 
   return (
-    <button ref={cardRef} className={`card text-card ${isSeen ? 'is-seen' : ''}`} onClick={open}>
+    <button ref={cardRef} className={`card text-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
       {meta}
       <span className="title">{item.title}</span>
       {item.summary ? <span className="summary">{item.summary}</span> : null}

@@ -26,6 +26,14 @@ export const en: typeof es = {
     whatsNew: 'What’s new in v{{version}}',
     gotIt: 'Got it',
   },
+  greeting: {
+    morning: 'Good morning ☀️',
+    afternoon: 'Good afternoon',
+    evening: 'Good evening 🌙',
+    morningLine: 'Your calm moment for today, no rush.',
+    afternoonLine: 'A quiet break for the afternoon.',
+    eveningLine: 'Something good to end the day.',
+  },
   types: { news: 'News', video: 'Videos', newsletter: 'Newsletters', tech: 'Tech', picture: 'Pictures', all: 'All' },
   typesDetail: {
     news: 'Good news and solutions',

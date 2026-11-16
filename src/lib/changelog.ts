@@ -6,6 +6,26 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.5.0',
+    notes: {
+      es: [
+        'Más acogedor: un saludo según la hora y colores que se templan a lo largo del día.',
+        'Las tarjetas llegan con suavidad y el punto se convierte en ✓ al verlas.',
+        'Al terminar, el sol se pone sobre el mar y salen las estrellas.',
+      ],
+      en: [
+        'Cosier: a greeting for the time of day and colours that warm up as the day goes on.',
+        'Cards arrive gently, and the dot turns into a ✓ once you’ve seen them.',
+        'When you finish, the sun sets over the sea and the stars come out.',
+      ],
+      ca: [
+        'Més acollidor: una salutació segons l’hora i colors que s’escalfen al llarg del dia.',
+        'Les targetes arriben amb suavitat i el punt es converteix en ✓ quan les veus.',
+        'En acabar, el sol es pon sobre el mar i surten les estrelles.',
+      ],
+    },
+  },
+  {
     version: '0.4.0',
     notes: {
       es: [

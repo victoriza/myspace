@@ -11,6 +11,7 @@
 - Languages: Spanish (default), English, Catalan. Every string goes in `src/i18n/{es,en,ca}.ts`.
 - Everything runs on the phone: no API keys, no logins. The only server piece is `api/relay.ts` (CORS relay).
 - Subtle UI: small, quiet controls; nothing that pushes the person to stay longer.
+- Cosy motion: slow, soft, play-once animations (sun and waves language); nothing loops for attention; everything respects "reduce motion".
 
 ## Code map
 - `src/lib/feed.ts` — daily pipeline: filter → pick (time budget, ≥2 pictures, per-source/topic/video caps) → order; also the "Hidden today" list.
@@ -19,6 +20,7 @@
 - `src/lib/fetchers.ts` — fetching through the relay, feed discovery, YouTube video lengths.
 - `api/relay.ts` — same-origin only, rate-limited per IP, 3 MB cap, no private hosts.
 - `src/state.tsx` — app state and refresh; `src/screens/` — screens.
+- `src/lib/daytime.ts` + `src/components/Cosy.tsx` — time-of-day greeting, living logo, warm palette (`<html data-daypart>`), mini loader.
 - `src/lib/update.ts` + `src/components/Updates.tsx` — new-version notice (service worker in "prompt" mode) and the one-time "What's new" card.
 - Tests: `npm test` (Vitest). Build: `npm run build`.
 

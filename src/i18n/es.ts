@@ -24,6 +24,14 @@ export const es = {
     whatsNew: 'Novedades en la v{{version}}',
     gotIt: 'Entendido',
   },
+  greeting: {
+    morning: 'Buenos días ☀️',
+    afternoon: 'Buenas tardes',
+    evening: 'Buenas noches 🌙',
+    morningLine: 'Tu rato tranquilo de hoy, con calma.',
+    afternoonLine: 'Una pausa tranquila para la tarde.',
+    eveningLine: 'Algo bueno para cerrar el día.',
+  },
   types: { news: 'Noticias', video: 'Vídeos', newsletter: 'Newsletters', tech: 'Tecnología', picture: 'Imágenes', all: 'Todo' },
   typesDetail: {
     news: 'Buenas noticias y soluciones',

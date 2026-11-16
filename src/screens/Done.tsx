@@ -7,9 +7,10 @@ export function Done() {
   const { settings } = useApp()
   return (
     <div className="done">
-      <div className="stars" aria-hidden="true">
-        {[[13, 90], [41, 60], [72, 120], [87, 200], [25, 180]].map(([x, y], k) => (
-          <span key={k} style={{ left: `${x}%`, top: y, animationDelay: `${k * 0.6}s` }} />
+      <div className="done-sky-warm" aria-hidden="true" />
+      <div className="stars done-stars" aria-hidden="true">
+        {[[13, 90], [41, 60], [72, 120], [87, 200], [25, 180], [58, 30], [93, 110], [6, 250]].map(([x, y], k) => (
+          <span key={k} style={{ left: `${x}%`, top: y, animationDelay: `${3.2 + k * 0.5}s, ${4 + k * 0.6}s` }} />
         ))}
       </div>
       <div className="done-text">

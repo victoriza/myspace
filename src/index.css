@@ -1,6 +1,6 @@
 :root {
-  --ground: #f6f5f1;
-  --paper: #fbfaf6;
+  --ground: #f7f3ea;
+  --paper: #fcfaf5;
   --surface: #ffffff;
   --ink: #172036;
   --ink-2: #3a4358;
@@ -10,7 +10,8 @@
   --navy: #1e2952;
   --sun: #e9b949;
   --teal: #2f6f7e;
-  --radius: 16px;
+  --radius: 20px;
+  --shadow: 0 1px 2px rgba(23, 32, 54, 0.04), 0 8px 24px -12px rgba(23, 32, 54, 0.12);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--ink);
@@ -20,7 +21,7 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; min-height: 100dvh; background: var(--ground); }
+body { margin: 0; min-height: 100dvh; background: var(--ground); transition: background-color 1.2s ease; }
 #root { max-width: 520px; margin: 0 auto; min-height: 100dvh; }
 button { font: inherit; color: inherit; cursor: pointer; }
 button:disabled { cursor: default; opacity: 0.6; }
@@ -51,7 +52,7 @@ h1, h2, h3, p { margin: 0; }
 .screen-intro { padding: 0 20px 12px; color: var(--muted); font-size: 14px; line-height: 1.4; }
 .section-label { margin: 6px 6px 0; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); }
 .section-label.light { color: #c9d0e3; margin: 0; }
-.card { background: var(--surface); border-radius: var(--radius); border: 0; text-align: left; }
+.card { background: var(--surface); border-radius: var(--radius); border: 0; text-align: left; box-shadow: var(--shadow); }
 .card.list { padding: 0 14px; display: flex; flex-direction: column; }
 .pad-card { padding: 14px 16px; }
 .card-title { font-size: 15px; font-weight: 600; }
@@ -246,7 +247,7 @@ h1, h2, h3, p { margin: 0; }
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--sun); }
 .done-text h1 { font-family: 'Space Grotesk', sans-serif; font-size: 36px; line-height: 1.08; letter-spacing: -0.6px; white-space: pre-line; }
 .done-text p:last-child { font-size: 16px; line-height: 1.5; color: #dce1ee; }
-.done-sun { position: absolute; left: 50%; top: 340px; width: 130px; height: 130px; margin-left: -65px; border-radius: 50%; background: radial-gradient(circle at 45% 35%, #f7d98c 0%, #e9b949 55%, #d2803a 100%); box-shadow: 0 0 80px rgba(233,150,73,0.45); animation: sf-set 3s cubic-bezier(.2,.7,.2,1) both; }
+.done-sun { position: absolute; left: 50%; top: 340px; width: 130px; height: 130px; margin-left: -65px; border-radius: 50%; background: radial-gradient(circle at 45% 35%, #f7d98c 0%, #e9b949 55%, #d2803a 100%); box-shadow: 0 0 80px rgba(233,150,73,0.45); animation: sf-set 6s cubic-bezier(.35,.1,.25,1) both; }
 .done-sea { position: absolute; left: 0; right: 0; top: 420px; bottom: 0; background: linear-gradient(#232d4c 60px, #232d4c); overflow: hidden; }
 .done-sea .w1 { top: -30px; animation: sf-wave 14s linear infinite; }
 .done-sea .w2 { top: -6px; animation: sf-wave 19s linear infinite reverse; }
@@ -258,7 +259,7 @@ h1, h2, h3, p { margin: 0; }
 
 /* ---------- motion ---------- */
 @keyframes sf-rise { 0% { transform: translateY(70px); opacity: 0 } 60% { opacity: 1 } 100% { transform: translateY(0); opacity: 1 } }
-@keyframes sf-set { 0% { transform: translateY(-40px) } 100% { transform: translateY(0) } }
+@keyframes sf-set { 0% { transform: translateY(-60px); filter: saturate(1.15) brightness(1.08) } 100% { transform: translateY(30px); filter: saturate(1) brightness(.95) } }
 @keyframes sf-glow { 0%, 100% { transform: scale(1); opacity: .55 } 50% { transform: scale(1.18); opacity: .25 } }
 @keyframes sf-wave { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 @keyframes sf-twinkle { 0%, 100% { opacity: .25 } 50% { opacity: 1 } }
@@ -314,3 +315,57 @@ h1, h2, h3, p { margin: 0; }
 .update-close svg { width: 16px; height: 16px; }
 .whats-new { padding: 16px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .whats-new ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+
+/* ---------- cosy layer (v0.5) ---------- */
+/* Warmer colours as the day goes on — set by <html data-daypart>. */
+:root[data-daypart='morning'] { --ground: #f7f3ea; --paper: #fcfaf5; }
+:root[data-daypart='afternoon'] { --ground: #f8efe6; --paper: #fdf8f3; }
+:root[data-daypart='evening'] { --ground: #efebf1; --paper: #f8f6fa; --surface: #fffdfc; }
+
+/* Greeting */
+.greeting { padding: 0 20px 12px; display: flex; flex-direction: column; gap: 2px; animation: sf-fadein .8s ease both; }
+.greeting-hello { font-family: 'Source Serif 4', Georgia, serif; font-size: 22px; font-weight: 600; letter-spacing: -0.2px; color: var(--ink); }
+
+/* Living logo */
+.living-logo { flex: none; border-radius: 7px; }
+.logo-glow { transform-box: fill-box; transform-origin: center; animation: sf-breathe 7s ease-in-out infinite; }
+@keyframes sf-breathe { 0%, 100% { opacity: .5; transform: scale(.85) } 50% { opacity: 1; transform: scale(1.15) } }
+
+/* Cards rise in gently (first open of the day) */
+.card.arrive { animation: sf-arrive .6s cubic-bezier(.2,.7,.2,1) backwards; }
+@keyframes sf-arrive { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
+
+/* Seen: the gold dot softly becomes a ✓ */
+.seen-mark.just-seen { animation: sf-seen .5s cubic-bezier(.3,1.4,.5,1) both; }
+.seen-mark.just-seen svg path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: sf-draw .45s .12s ease-out forwards; }
+@keyframes sf-seen { from { opacity: 0; transform: scale(.6) } to { opacity: 1; transform: none } }
+@keyframes sf-draw { to { stroke-dashoffset: 0 } }
+.card { transition: opacity .6s ease, box-shadow .3s ease; }
+
+/* Soft page changes */
+.page { animation: sf-fadein .28s ease both; }
+.page.page-slide { animation: sf-slidein .32s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes sf-fadein { from { opacity: 0 } to { opacity: 1 } }
+@keyframes sf-slidein { from { opacity: 0; transform: translateX(14px) } to { opacity: 1; transform: none } }
+
+/* Mini loader while refreshing */
+.mini-loader { margin: 0 12px 10px; padding: 8px 14px; border-radius: 14px; background: var(--paper); box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--ink-2); overflow: hidden; }
+.mini-loader svg { flex: none; }
+.mini-sun { animation: sf-mini-rise 2.4s ease-in-out infinite alternate; transform-box: fill-box; }
+.mini-waves { animation: sf-mini-wave 3s linear infinite; }
+.mini-msg { animation: sf-fade 2.6s ease-in-out both; }
+@keyframes sf-mini-rise { from { transform: translateY(5px) } to { transform: translateY(-3px) } }
+@keyframes sf-mini-wave { from { transform: translateX(0) } to { transform: translateX(22px) } }
+
+/* End of day: the sun sets into the waves, the sky turns to dusk, stars come out */
+.done-sky-warm { position: absolute; inset: 0; background: linear-gradient(180deg, #3b4a7a 0%, #8a6a86 45%, #e0956a 75%, #f2b77a 100%); animation: sf-dusk 6.5s ease-in both; pointer-events: none; }
+@keyframes sf-dusk { 0%, 15% { opacity: 1 } 100% { opacity: 0 } }
+.done-sea { z-index: 1; }
+.done-text, .done-bottom { animation: sf-fadein 1.4s .4s ease both; }
+.done-stars span { animation-name: sf-appear, sf-twinkle; animation-duration: 1.5s, 4s; animation-timing-function: ease, ease-in-out; animation-iteration-count: 1, infinite; animation-fill-mode: both, none; }
+@keyframes sf-appear { from { opacity: 0 } to { opacity: .8 } }
+
+@media (prefers-reduced-motion: reduce) {
+  .done-sky-warm { display: none; }
+  .done-stars span { opacity: .8; }
+}

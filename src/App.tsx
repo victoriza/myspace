@@ -10,6 +10,7 @@ import { Done } from './screens/Done'
 import { Feed } from './screens/Feed'
 import { Filters } from './screens/Filters'
 import { Loading } from './screens/Loading'
+import { trackDayPart } from './lib/daytime'
 import { More } from './screens/More'
 import { OpenSocial } from './screens/OpenSocial'
 import { Sources } from './screens/Sources'
@@ -24,6 +25,7 @@ export default function App() {
   const route = useRoute()
   const { t } = useTranslation()
   const { settings, refresh, loading, today, seen } = useApp()
+  useEffect(() => trackDayPart(), [])
   const [splash, setSplash] = useState(true)
   const [welcome, setWelcome] = useState<string | null>(null)
 
@@ -69,6 +71,7 @@ export default function App() {
   if (splash || (loading && !today)) return <Loading />
 
   const [page, arg] = route
+  const content = (() => {
   switch (page) {
     case 'why':
       return <Why />
@@ -97,4 +100,13 @@ export default function App() {
     default:
       return settings.onboarded ? <Feed welcome={welcome} /> : <Why />
   }
+  })()
+  // Soft page change: opening an item cross-fades with a small slide; other screens just fade.
+  // (No transform on screens with the fixed bottom bar, so it doesn't jump.)
+  const slide = page === 'article' || page === 'video'
+  return (
+    <div key={route.join('/') || 'feed'} className={`page${slide ? ' page-slide' : ''}`}>
+      {content}
+    </div>
+  )
 }

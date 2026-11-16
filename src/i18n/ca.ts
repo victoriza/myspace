@@ -26,6 +26,14 @@ export const ca: typeof es = {
     whatsNew: 'Novetats de la v{{version}}',
     gotIt: 'Entesos',
   },
+  greeting: {
+    morning: 'Bon dia ☀️',
+    afternoon: 'Bona tarda',
+    evening: 'Bona nit 🌙',
+    morningLine: 'La teva estona tranquil·la d’avui, sense presses.',
+    afternoonLine: 'Una pausa tranquil·la per a la tarda.',
+    eveningLine: 'Alguna cosa bona per tancar el dia.',
+  },
   types: { news: 'Notícies', video: 'Vídeos', newsletter: 'Butlletins', tech: 'Tecnologia', picture: 'Imatges', all: 'Tot' },
   typesDetail: {
     news: 'Bones notícies i solucions',

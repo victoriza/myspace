@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Icon, LangSwitch } from '../components/ui'
+import { defaultEnabledSources } from '../lib/sources'
 import { back, go } from '../router'
 import { useApp } from '../state'
 
@@ -27,7 +28,7 @@ export function Why() {
               {Icon.back}
             </button>
           )}
-          <LangSwitch dark value={settings.lang} onChange={(lang) => updateSettings({ lang })} />
+          <LangSwitch dark value={settings.lang} onChange={(lang) => updateSettings(firstRun ? { lang, enabledSources: defaultEnabledSources(lang) } : { lang })} />
         </div>
         <h1>{t('why.title')}</h1>
         <p>{t('why.intro')}</p>

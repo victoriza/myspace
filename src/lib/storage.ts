@@ -43,8 +43,9 @@ export function detectLang(): Lang {
 }
 
 export function defaultSettings(): Settings {
+  const lang = detectLang()
   return {
-    lang: detectLang(),
+    lang,
     onboarded: false,
     types: { news: true, video: true, newsletter: true, tech: false, picture: true },
     minutesPerDay: 20,
@@ -53,7 +54,7 @@ export function defaultSettings(): Settings {
     skipShorts: true,
     blockWords: ['drama', 'salseo', 'polémica', 'reaction'],
     blockedChannels: [],
-    enabledSources: defaultEnabledSources(),
+    enabledSources: defaultEnabledSources(lang),
     customSources: [],
     shortcuts: { instagram: true, tiktok: true },
     openHour: 7,

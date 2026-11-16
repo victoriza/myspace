@@ -21,6 +21,8 @@ export interface Source {
   handle?: string
   /** On by default for new users. */
   defaultOn?: boolean
+  /** On by default only for people using the app in these languages. */
+  defaultOnFor?: Lang[]
   /** Added by the user (not from the suggested list). */
   custom?: boolean
 }

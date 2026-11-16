@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { buildDailyFeed, estimateMinutes, orderMixed, pickDaily, totalMinutes } from './feed'
 import { parseFeed } from './parse'
+import { defaultEnabledSources } from './sources'
 import { defaultSettings } from './storage'
 import type { FeedItem, Source } from './types'
 
@@ -79,5 +80,13 @@ describe('parsing', () => {
     expect(items[0].image).toContain('ytimg')
     expect(items[0].summary).toBe('Desc')
     expect(items[1].isShort).toBe(true)
+  })
+})
+
+describe('suggested sources', () => {
+  it('turns Catalan sources on by default only for Catalan users', () => {
+    expect(defaultEnabledSources('ca')).toContain('metode')
+    expect(defaultEnabledSources('es')).not.toContain('metode')
+    expect(defaultEnabledSources('es')).toContain('noticias-positivas')
   })
 })

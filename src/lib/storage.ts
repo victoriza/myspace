@@ -29,7 +29,6 @@ const K = {
   today: 'sf.today.v1',
   cache: 'sf.cache.v1',
   channels: 'sf.channels.v1',
-  socialSession: 'sf.social.v1',
   durations: 'sf.durations.v1',
   lastVersion: 'sf.version.v1',
 }
@@ -59,7 +58,6 @@ export function defaultSettings(): Settings {
     blockedChannels: [],
     enabledSources: defaultEnabledSources(lang),
     customSources: [],
-    shortcuts: { instagram: true, tiktok: true },
     knownSources: SUGGESTED_SOURCES.map((s) => s.id),
     openHour: 7,
   }
@@ -69,7 +67,8 @@ export function loadSettings(): Settings {
   const d = defaultSettings()
   const s = read<Partial<Settings> & { perDay?: unknown }>(K.settings, {})
   delete s.perDay // v0 used an item count; now it's minutes
-  const merged: Settings = { ...d, ...s, types: { ...d.types, ...(s.types || {}) }, shortcuts: { ...d.shortcuts, ...(s.shortcuts || {}) } }
+  delete (s as { shortcuts?: unknown }).shortcuts // v0.5.1: Instagram/TikTok shortcuts removed
+  const merged: Settings = { ...d, ...s, types: { ...d.types, ...(s.types || {}) } }
   // New suggested sources that are on by default: switch them on once for existing users.
   if (s.enabledSources) {
     const known = new Set(s.knownSources ?? V01_SOURCE_IDS)
@@ -119,13 +118,6 @@ export function saveCache(c: SourceCache) {
 export const loadChannelIds = () => read<Record<string, string>>(K.channels, {})
 export const saveChannelIds = (c: Record<string, string>) => write(K.channels, c)
 
-export interface SocialSession {
-  app: 'instagram' | 'tiktok'
-  openedAt: number
-  limitMin: number
-}
-export const loadSocial = () => read<SocialSession | null>(K.socialSession, null)
-export const saveSocial = (s: SocialSession | null) => write(K.socialSession, s)
 
 export function clearAll() {
   try {

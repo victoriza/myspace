@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { loadSocial, saveSocial } from './lib/storage'
 import { go, useRoute } from './router'
 import { About } from './screens/About'
 import { AddSource } from './screens/AddSource'
@@ -12,7 +10,6 @@ import { Filters } from './screens/Filters'
 import { Loading } from './screens/Loading'
 import { trackDayPart } from './lib/daytime'
 import { More } from './screens/More'
-import { OpenSocial } from './screens/OpenSocial'
 import { Sources } from './screens/Sources'
 import { Suggested } from './screens/Suggested'
 import { Video } from './screens/Video'
@@ -23,11 +20,9 @@ const SPLASH_MIN_MS = 1800
 
 export default function App() {
   const route = useRoute()
-  const { t } = useTranslation()
   const { settings, refresh, loading, today, seen } = useApp()
   useEffect(() => trackDayPart(), [])
   const [splash, setSplash] = useState(true)
-  const [welcome, setWelcome] = useState<string | null>(null)
 
   // First load: show the calm splash, fetch today's feed, then route.
   useEffect(() => {
@@ -50,23 +45,15 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [splash])
 
-  // Back from Instagram/TikTok, or a new day: check the time limit and refresh.
+  // Back to the app (maybe a new day): refresh.
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return
-      const s = loadSocial()
-      if (s) {
-        const minutes = Math.round((Date.now() - s.openedAt) / 60000)
-        if (Date.now() - s.openedAt > 10_000) saveSocial(null)
-        if (s.limitMin > 0 && minutes >= s.limitMin) {
-          setWelcome(t('feed.welcomeBack', { min: minutes, app: s.app === 'instagram' ? 'Instagram' : 'TikTok' }))
-        }
-      }
       if (settings.onboarded) void refresh()
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
-  }, [refresh, settings.onboarded, t])
+  }, [refresh, settings.onboarded])
 
   if (splash || (loading && !today)) return <Loading />
 
@@ -95,10 +82,8 @@ export default function App() {
       return <AddSource />
     case 'more':
       return <More />
-    case 'open':
-      return <OpenSocial app={arg === 'tiktok' ? 'tiktok' : 'instagram'} />
     default:
-      return settings.onboarded ? <Feed welcome={welcome} /> : <Why />
+      return settings.onboarded ? <Feed /> : <Why />
   }
   })()
   // Soft page change: opening an item cross-fades with a small slide; other screens just fade.

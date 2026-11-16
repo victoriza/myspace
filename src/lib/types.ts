@@ -78,7 +78,6 @@ export interface Settings {
   /** Ids of sources the person follows. */
   enabledSources: string[]
   customSources: Source[]
-  shortcuts: { instagram: boolean; tiktok: boolean }
   /** Suggested sources the person has already been offered — new suggestions that are on by default get switched on once. */
   knownSources: string[]
   /** Hour of the day when tomorrow's feed opens. */

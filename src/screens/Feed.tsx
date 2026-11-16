@@ -10,9 +10,9 @@ import { go } from '../router'
 import { sourceMeta } from '../lib/sources'
 import { useApp } from '../state'
 
-export function Feed({ welcome }: { welcome?: string | null }) {
+export function Feed() {
   const { t } = useTranslation()
-  const { today, seen, settings, loading, failedSources, markSeen } = useApp()
+  const { today, seen, loading, failedSources, markSeen } = useApp()
   const [filter, setFilter] = useState<ContentType | 'all'>('all')
   const [hideSeen, setHideSeen] = useState(false)
   // Grouping (new vs "seen earlier") uses what was seen when the feed opened,
@@ -50,19 +50,10 @@ export function Feed({ welcome }: { welcome?: string | null }) {
           <LivingLogo />
           <h1>Space Feed</h1>
         </div>
-        <div className="social-buttons">
-          {settings.shortcuts.instagram ? (
-            <button className="social-btn ig" aria-label={t('feed.instagramFriends')} onClick={() => go('open', 'instagram')}>IG</button>
-          ) : null}
-          {settings.shortcuts.tiktok ? (
-            <button className="social-btn tt" aria-label={t('feed.tiktokFriends')} onClick={() => go('open', 'tiktok')}>TT</button>
-          ) : null}
-        </div>
       </header>
 
       <Greeting />
       <UpdateBar />
-      {welcome ? <div className="notice">{welcome}</div> : null}
 
       {presentTypes.length > 1 ? (
         <div className="chips" role="radiogroup" aria-label={t('types.all')}>

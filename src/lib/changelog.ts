@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.5.1',
+    notes: {
+      es: ['Hemos quitado los accesos a Instagram y TikTok: Space Feed es tu rato tranquilo, sin puertas a feeds infinitos.'],
+      en: ['We removed the Instagram and TikTok shortcuts: Space Feed is your calm moment, with no doors to endless feeds.'],
+      ca: ['Hem tret els accessos a Instagram i TikTok: Space Feed és la teva estona tranquil·la, sense portes a feeds infinits.'],
+    },
+  },
+  {
     version: '0.5.0',
     notes: {
       es: [

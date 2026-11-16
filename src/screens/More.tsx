@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BottomNav, Icon, Switch } from '../components/ui'
+import { BottomNav, Icon } from '../components/ui'
 import { go } from '../router'
 import { useApp } from '../state'
 
 export function More() {
   const { t } = useTranslation()
-  const { settings, updateSettings, resetAll } = useApp()
+  const { resetAll } = useApp()
   const [confirm, setConfirm] = useState(false)
 
   return (
@@ -16,20 +16,6 @@ export function More() {
         <p className="muted small">{t('more.subtitle')}</p>
       </header>
       <main className="stack">
-        <h2 className="section-label">{t('more.shortcuts')}</h2>
-        <div className="card list">
-          <div className="row">
-            <span className="app-badge ig" aria-hidden="true">IG</span>
-            <span className="row-text"><strong>Instagram</strong><span className="muted small">{t('more.instagramHint')}</span></span>
-            <Switch label="Instagram" checked={settings.shortcuts.instagram} onChange={(v) => updateSettings({ shortcuts: { ...settings.shortcuts, instagram: v } })} />
-          </div>
-          <div className="row">
-            <span className="app-badge tt" aria-hidden="true">TT</span>
-            <span className="row-text"><strong>TikTok</strong><span className="muted small">{t('more.tiktokHint')}</span></span>
-            <Switch label="TikTok" checked={settings.shortcuts.tiktok} onChange={(v) => updateSettings({ shortcuts: { ...settings.shortcuts, tiktok: v } })} />
-          </div>
-        </div>
-
         <div className="card pad-card stack-tight">
           <strong>{t('more.youtube')}</strong>
           <p className="muted small">{t('more.youtubeHint')}</p>

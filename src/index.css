@@ -127,10 +127,6 @@ h1, h2, h3, p { margin: 0; }
 .meta .muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ---------- feed ---------- */
-.social-buttons { display: flex; gap: 8px; }
-.social-btn, .app-badge { width: 40px; height: 40px; border-radius: 12px; border: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex: none; }
-.ig { background: #f6e3ec; color: #8a2752; }
-.tt { background: #e1eef0; color: #1f5a63; }
 .app-badge.big { width: 56px; height: 56px; border-radius: 16px; font-size: 18px; }
 .status-row { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 8px; }
 .notice { margin: 0 12px 10px; padding: 12px 14px; border-radius: 12px; background: #fbf1d9; color: #5a420b; font-size: 14px; }
@@ -204,19 +200,6 @@ h1, h2, h3, p { margin: 0; }
 .ok-dot { width: 28px; height: 28px; border-radius: 14px; background: #ddefe8; color: #1f5a45; display: flex; align-items: center; justify-content: center; }
 .bordered { border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
 
-/* ---------- social ---------- */
-.social-screen { min-height: 100dvh; background: var(--navy); color: #fff; display: flex; flex-direction: column; }
-.social-screen header { padding: 16px 12px 0; }
-.social-screen main { flex: 1; padding: 8px 24px 24px; gap: 24px; }
-.social-screen h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; line-height: 1.15; letter-spacing: -0.4px; }
-.soft { color: #c9d0e3; font-size: 15px; line-height: 1.45; }
-.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.steps li { display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,0.08); border-radius: 14px; padding: 12px 14px; font-size: 15px; line-height: 1.4; }
-.step-n { width: 26px; height: 26px; flex: none; border-radius: 13px; background: var(--sun); color: var(--navy); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
-.limit-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.limit-grid button { min-height: 48px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.35); background: transparent; color: #fff; font-weight: 600; }
-.limit-grid button.on { border-color: #fff; background: #fff; color: var(--navy); }
-.social-bottom { padding: 0 24px calc(28px + var(--safe-bottom)); display: flex; flex-direction: column; gap: 8px; }
 
 /* ---------- loading ---------- */
 .loading, .done { position: fixed; inset: 0; overflow: hidden; color: #fff; z-index: 50; }

@@ -1,0 +1,76 @@
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Icon, TypeTag } from '../components/ui'
+import { timeAgo } from '../lib/time'
+import { back, go } from '../router'
+import { useApp } from '../state'
+
+export function Video({ id }: { id: string }) {
+  const { t, i18n } = useTranslation()
+  const { itemById, markSeen, seen, today, settings, updateSettings } = useApp()
+  const item = itemById(id)
+  const [hidden, setHidden] = useState(false)
+
+  // Opening a video counts as seen in the feed; "Mark watched" is just explicit.
+  useEffect(() => {
+    if (item) markSeen(item.id)
+  }, [item, markSeen])
+
+  if (!item || !item.videoId) {
+    return (
+      <div className="screen center-screen">
+        <button className="btn-primary" onClick={() => go()}>{t('nav.feed')}</button>
+      </div>
+    )
+  }
+
+  const next = today?.items.find((i) => i.id !== item.id && !seen[i.id])
+  const hideChannel = () => {
+    updateSettings({ blockedChannels: [...new Set([...settings.blockedChannels, item.sourceId])] })
+    setHidden(true)
+  }
+  // youtube.com (not -nocookie) so a signed-in Premium account is recognized.
+  const src = `https://www.youtube.com/embed/${encodeURIComponent(item.videoId)}?rel=0&modestbranding=1&playsinline=1&autoplay=1`
+
+  return (
+    <div className="screen video-screen">
+      <header className="reader-header">
+        <button className="icon-btn" aria-label={t('nav.back')} onClick={back}>{Icon.back}</button>
+      </header>
+      <div className="player">
+        <iframe
+          src={src}
+          title={item.title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      </div>
+      <main className="stack pad">
+        <span className="meta">
+          <TypeTag type="video" />
+          <span className="muted">{item.sourceName} · {timeAgo(item.date, i18n.language as 'es')}</span>
+        </span>
+        <h1 className="video-title">{item.title}</h1>
+        {item.summary ? <p className="muted clamp-3">{item.summary}</p> : null}
+
+        <div className="grid-3">
+          <button className="btn-secondary on" disabled>{Icon.check} {t('video.watched')}</button>
+          <button className="btn-secondary" onClick={hideChannel} disabled={hidden}>{hidden ? t('video.channelHidden') : t('video.hideChannel')}</button>
+          <a className="btn-secondary" href={item.link} target="_blank" rel="noopener noreferrer">{t('video.onYouTube')}</a>
+        </div>
+
+        {next ? (
+          <>
+            <h2 className="section-label">{t('video.upNext')}</h2>
+            <button className="card text-card" onClick={() => go(next.type === 'video' && next.videoId ? 'video' : 'article', next.id)}>
+              <span className="meta"><TypeTag type={next.type} /><span className="muted">{next.sourceName}</span></span>
+              <span className="title">{next.title}</span>
+            </button>
+          </>
+        ) : null}
+        <p className="muted small">{t('video.noAutoplay')}</p>
+      </main>
+    </div>
+  )
+}

@@ -1,0 +1,72 @@
+import { describe, expect, it } from 'vitest'
+import { buildDailyFeed, orderMixed, pickDaily } from './feed'
+import { parseFeed } from './parse'
+import { defaultSettings } from './storage'
+import type { FeedItem, Source } from './types'
+
+const now = Date.UTC(2026, 10, 16, 10)
+const H = 60 * 60 * 1000
+
+function item(i: number, over: Partial<FeedItem> = {}): FeedItem {
+  return { id: 'i' + i, sourceId: 's' + (i % 3), sourceName: 'S', type: 'news', title: 'Calm title ' + i, link: 'https://x/' + i, date: now - i * H, summary: '', ...over }
+}
+
+describe('feed pipeline', () => {
+  it('caps items per source and respects the daily amount', () => {
+    const items = Array.from({ length: 30 }, (_, i) => item(i))
+    const picked = pickDaily(items, 20)
+    expect(picked.length).toBe(9) // 3 sources × 3 each
+    expect(pickDaily(items, 5).length).toBe(5)
+  })
+
+  it('never puts two videos in a row when it can avoid it', () => {
+    const items = [
+      item(1, { type: 'video', sourceId: 'v1' }),
+      item(2, { type: 'video', sourceId: 'v2' }),
+      item(3, { type: 'news', sourceId: 'n1' }),
+      item(4, { type: 'video', sourceId: 'v3' }),
+      item(5, { type: 'news', sourceId: 'n2' }),
+    ]
+    const ordered = orderMixed(items)
+    for (let i = 1; i < ordered.length; i++) expect(ordered[i].type === 'video' && ordered[i - 1].type === 'video').toBe(false)
+  })
+
+  it('drops seen, old, political and dramatic items', () => {
+    const settings = defaultSettings()
+    const items = [
+      item(1),
+      item(2, { title: 'El Gobierno presenta su plan' }),
+      item(3, { title: 'SHOCKING drama!!!' }),
+      item(4, { date: now - 30 * 24 * H }),
+      item(5),
+    ]
+    const { items: out, hidden } = buildDailyFeed(items, settings, { i5: now }, now)
+    expect(out.map((i) => i.id)).toEqual(['i1'])
+    expect(hidden.map((h) => h.reason).sort()).toEqual(['calm', 'old', 'politics', 'seen'])
+  })
+})
+
+describe('parsing', () => {
+  const src: Source = { id: 'src', name: 'Src', lang: 'en', type: 'news', kind: 'rss' }
+  it('parses RSS 2.0', () => {
+    const xml = `<?xml version="1.0"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>T</title>
+      <item><title>Hello &amp; welcome</title><link>https://a.com/1</link><pubDate>Mon, 16 Nov 2026 08:00:00 GMT</pubDate>
+      <description>&lt;p&gt;Short &lt;b&gt;summary&lt;/b&gt;.&lt;/p&gt;</description><guid>g1</guid></item></channel></rss>`
+    const [it0] = parseFeed(xml, src)
+    expect(it0.title).toBe('Hello & welcome')
+    expect(it0.summary).toBe('Short summary.')
+    expect(it0.link).toBe('https://a.com/1')
+  })
+  it('parses a YouTube Atom feed', () => {
+    const xml = `<?xml version="1.0"?><feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+      <title>Chan</title><entry><id>yt:video:abc</id><yt:videoId>abc</yt:videoId><title>How tides work</title>
+      <link rel="alternate" href="https://www.youtube.com/watch?v=abc"/><published>2026-11-15T10:00:00+00:00</published>
+      <media:group><media:title>How tides work</media:title><media:thumbnail url="https://i.ytimg.com/vi/abc/hqdefault.jpg" width="480" height="360"/><media:description>Desc</media:description></media:group></entry>
+      <entry><id>yt:video:def</id><yt:videoId>def</yt:videoId><title>Short one</title><link rel="alternate" href="https://www.youtube.com/shorts/def"/><published>2026-11-15T11:00:00+00:00</published></entry></feed>`
+    const items = parseFeed(xml, { ...src, type: 'video', kind: 'youtube' })
+    expect(items[0].videoId).toBe('abc')
+    expect(items[0].image).toContain('ytimg')
+    expect(items[0].summary).toBe('Desc')
+    expect(items[1].isShort).toBe(true)
+  })
+})

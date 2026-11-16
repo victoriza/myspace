@@ -1,0 +1,55 @@
+/// <reference types="vitest/config" />
+import react from '@vitejs/plugin-react'
+import { defineConfig, type Plugin } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
+
+/** Runs api/relay.ts inside `npm run dev`, so the app works locally without the Vercel CLI. */
+function relayDev(): Plugin {
+  return {
+    name: 'relay-dev',
+    configureServer(server) {
+      server.middlewares.use('/api/relay', async (req, res) => {
+        const mod = await server.ssrLoadModule('/api/relay.ts')
+        const response: Response = await mod.GET(new Request('http://localhost' + req.originalUrl))
+        res.statusCode = response.status
+        response.headers.forEach((v, k) => res.setHeader(k, v))
+        res.end(Buffer.from(await response.arrayBuffer()))
+      })
+    },
+  }
+}
+
+export default defineConfig({
+  plugins: [
+    react(),
+    relayDev(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'Space Feed',
+        short_name: 'Space Feed',
+        description: 'A calm daily feed: good news, videos and ideas — then it ends.',
+        lang: 'es',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#F6F5F1',
+        theme_color: '#1E2952',
+        icons: [
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
+      },
+    }),
+  ],
+  test: {
+    environment: 'jsdom',
+  },
+})

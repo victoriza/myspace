@@ -4,10 +4,48 @@
  * so this is the only server piece. It needs no keys and stores nothing.
  *
  * GET /api/relay?url=https://example.com/feed
+ *
+ * Abuse protection (no keys, so it can't be perfect):
+ * - only requests made by the app itself (same origin) are served;
+ * - at most RATE_LIMIT requests per IP every RATE_WINDOW_MS (per server instance);
+ * - only feeds, HTML and plain text, at most 3 MB, never private/internal addresses.
  */
 
 const MAX_BYTES = 3 * 1024 * 1024
 const TIMEOUT_MS = 10000
+const RATE_LIMIT = 300
+const RATE_WINDOW_MS = 10 * 60 * 1000
+const hits = new Map<string, { count: number; reset: number }>()
+
+/** Simple fixed-window limiter. Lives in memory, so it's per instance — enough to stop casual abuse. */
+export function rateLimited(ip: string, now = Date.now()): boolean {
+  if (hits.size > 5000) for (const [k, v] of hits) if (v.reset < now) hits.delete(k)
+  const entry = hits.get(ip)
+  if (!entry || entry.reset < now) {
+    hits.set(ip, { count: 1, reset: now + RATE_WINDOW_MS })
+    return false
+  }
+  entry.count++
+  return entry.count > RATE_LIMIT
+}
+
+/**
+ * True when the request comes from a page on our own site. Browsers set Sec-Fetch-Site (and can't be
+ * made to lie about it); older ones fall back to Origin/Referer. Requests with none of them are refused.
+ */
+export function isSameOrigin(request: Request): boolean {
+  const site = request.headers.get('sec-fetch-site')
+  if (site) return site === 'same-origin'
+  const self = new URL(request.url).host
+  const from = request.headers.get('origin') || request.headers.get('referer')
+  if (!from) return false
+  try {
+    return new URL(from).host === self
+  } catch {
+    return false
+  }
+}
+
 const ALLOWED_TYPES = /(xml|rss|atom|html|text\/plain)/i
 
 function isBlockedHost(hostname: string): boolean {
@@ -34,6 +72,10 @@ function json(status: number, message: string): Response {
 }
 
 export async function GET(request: Request): Promise<Response> {
+  if (!isSameOrigin(request)) return json(403, 'only for the Space Feed app')
+  const ip = (request.headers.get('x-real-ip') || request.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim()
+  if (rateLimited(ip)) return json(429, 'too many requests')
+
   const target = new URL(request.url).searchParams.get('url')
   if (!target) return json(400, 'missing url')
 

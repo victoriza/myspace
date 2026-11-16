@@ -181,13 +181,20 @@ function Card({ item, isSeen, cardRef }: { item: FeedItem; isSeen: boolean; card
   )
 
   if (item.type === 'video') {
+    const videoMeta = (
+      <span className="meta">
+        <TypeTag type={item.type} />
+        <span className="muted">{item.sourceName}{item.minutes ? ` · ${item.minutes} min` : ''} · {timeAgo(item.date, lang)}</span>
+        {seenMark}
+      </span>
+    )
     return (
       <button ref={cardRef} className={`card video-card ${isSeen ? 'is-seen' : ''}`} onClick={open}>
         <span className="thumb" style={item.image ? { backgroundImage: `url("${item.image}")` } : undefined}>
           <span className="play">{Icon.play}</span>
         </span>
         <span className="video-text">
-          {meta}
+          {videoMeta}
           <span className="title">{item.title}</span>
         </span>
       </button>

@@ -34,6 +34,8 @@ interface AppState {
   itemById: (id: string) => FeedItem | undefined
   /** Turns a source off and drops its other items from today's feed. Returns an undo function. */
   removeSource: (sourceId: string, keepItemId?: string) => () => void
+  /** Lets one filtered-out item into today's feed. */
+  showFiltered: (itemId: string) => void
   resetAll: () => void
 }
 
@@ -119,8 +121,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // Items already seen *today* stay in today's feed (under "Seen earlier").
       const start = dayStart(now, s.openHour)
       const seenBefore = Object.fromEntries(Object.entries(seenRef.current).filter(([, t]) => t < start))
-      const { items } = buildDailyFeed(results.flat(), s, seenBefore, now)
-      const next = { day, items }
+      const { items, filtered } = buildDailyFeed(results.flat(), s, seenBefore, now)
+      const next = { day, items, filtered }
       saveToday(next)
       setToday(next)
       setFailed(failed)
@@ -155,6 +157,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [updateSettings])
 
+  const showFiltered = useCallback((itemId: string) => {
+    const current = loadToday()
+    const hit = current?.filtered?.find((h) => h.item.id === itemId)
+    if (!current || !hit) return
+    const next = { ...current, items: [...current.items, hit.item], filtered: current.filtered!.filter((h) => h.item.id !== itemId) }
+    saveToday(next)
+    setToday(next)
+  }, [])
+
   const resetAll = useCallback(() => {
     clearAll()
     clearToday()
@@ -167,8 +178,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo<AppState>(
-    () => ({ settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, removeSource, resetAll }),
-    [settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, removeSource, resetAll],
+    () => ({ settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, removeSource, showFiltered, resetAll }),
+    [settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, removeSource, showFiltered, resetAll],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

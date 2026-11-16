@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildDailyFeed, estimateMinutes, nextItem, orderMixed, pickDaily, totalMinutes } from './feed'
-import { parseFeed } from './parse'
+import { findDurationSeconds, parseFeed } from './parse'
 import { defaultEnabledSources } from './sources'
 import { defaultSettings } from './storage'
 import type { FeedItem, Source, Topic } from './types'
@@ -53,6 +53,26 @@ describe('feed pipeline', () => {
     const sciMinutes = totalMinutes(picked.filter((i) => topic(i) === 'science'))
     expect(sciMinutes).toBeLessThanOrEqual(8)
     expect(totalMinutes(picked)).toBe(16) // 8 + 8: the rest stays empty rather than all-science
+  })
+
+  it('lists what the filters hid today, with the reason', () => {
+    const s = defaultSettings()
+    const items = [
+      item(1, { title: 'El Gobierno aprueba una ley', sourceId: 'a' }),
+      item(2, { title: 'Miracle cure works in mice', sourceId: 'b' }),
+      item(3, { title: 'Your weekly horoscope', sourceId: 'c' }),
+      item(4, { title: 'Seagrass is returning to the coast', sourceId: 'd' }),
+    ]
+    const { items: today, filtered } = buildDailyFeed(items, s, {}, now)
+    expect(today.map((i) => i.id)).toEqual(['i4'])
+    expect(filtered.map((h) => [h.item.id, h.kind])).toEqual([['i1', 'politics'], ['i2', 'hype'], ['i3', 'pseudo']])
+    expect(filtered[0].word).toBe('gobierno')
+  })
+
+  it('reads a video length from the watch page', () => {
+    expect(findDurationSeconds('..."videoDetails":{"videoId":"x","lengthSeconds":"754","keywords"...')).toBe(754)
+    expect(findDurationSeconds('<meta itemprop="duration" content="PT1H2M3S">')).toBe(3723)
+    expect(findDurationSeconds('<html></html>')).toBeNull()
   })
 
   it('never puts two videos in a row when it can avoid it', () => {

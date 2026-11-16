@@ -164,6 +164,23 @@ export function threshold(s: Strictness): number {
   return s === 'strict' ? 2 : s === 'relaxed' ? 4 : 3
 }
 
+export type HiddenKind = 'politics' | 'blocked' | 'pseudo' | 'hype' | 'clickbait' | 'style'
+
+/** Why a calm-filter score was too high, as a kind and the main word (for "Hidden today"). */
+export function explain(reasons: string[]): { kind: HiddenKind; word?: string } {
+  const first = (prefix: string) => reasons.find((r) => r.startsWith(prefix))?.slice(prefix.length)
+  const blocked = first('blocked: ')
+  if (blocked) return { kind: 'blocked', word: blocked }
+  const pseudo = first('pseudoscience: ')
+  if (pseudo) return { kind: 'pseudo', word: pseudo }
+  const style = new Set(['ALL CAPS', 'caps words', '!!!', 'alarm emoji', 'emoji spam', 'cliffhanger'])
+  const click = reasons.find((r) => !r.startsWith('hype: ') && !style.has(r))
+  if (click) return { kind: 'clickbait', word: click }
+  const hype = first('hype: ')
+  if (hype) return { kind: 'hype', word: hype }
+  return { kind: 'style', word: reasons[0] }
+}
+
 export function isCalm(title: string, summary: string, strictness: Strictness, blockWords: string[] = []): boolean {
   const r = scoreText(title, summary, blockWords)
   return !r.blocked && r.score < threshold(strictness)
@@ -171,10 +188,15 @@ export function isCalm(title: string, summary: string, strictness: Strictness, b
 
 /** True if the text is about politics (parties, elections, governments…). */
 export function isPolitical(title: string, summary = ''): boolean {
+  return politicalMatch(title, summary) !== null
+}
+
+/** The politics word or party that matched, or null. */
+export function politicalMatch(title: string, summary = ''): string | null {
   const nt = normalize(title)
   const ns = normalize(summary.slice(0, 400))
-  for (const [, rx] of POLITICS_RX) {
-    if (rx.test(nt) || rx.test(ns)) return true
+  for (const [p, rx] of POLITICS_RX) {
+    if (rx.test(nt) || rx.test(ns)) return p
   }
   const raw = title + ' \n ' + summary.slice(0, 400)
   for (const [p, rx] of PARTY_RX) {
@@ -186,8 +208,8 @@ export function isPolitical(title: string, summary = ''): boolean {
         const before = raw.slice(0, start).trimEnd()
         if (before === '' || /[.!?¡¿:\n]$/.test(before)) continue
       }
-      return true
+      return p
     }
   }
-  return false
+  return null
 }

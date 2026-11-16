@@ -147,3 +147,12 @@ export function findTitle(text: string): string | null {
   const t = m[1].replace(/&amp;/g, '&').replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').trim()
   return t.replace(/\s*-\s*YouTube$/, '') || null
 }
+
+/** Length of a YouTube video, in seconds, from its watch page (null if not found). */
+export function findDurationSeconds(html: string): number | null {
+  const m = html.match(/"lengthSeconds"\s*:\s*"(\d+)"/)
+  if (m) return Number(m[1])
+  const iso = html.match(/itemprop="duration"\s+content="PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?"/)
+  if (iso && (iso[1] || iso[2] || iso[3])) return Number(iso[1] || 0) * 3600 + Number(iso[2] || 0) * 60 + Number(iso[3] || 0)
+  return null
+}

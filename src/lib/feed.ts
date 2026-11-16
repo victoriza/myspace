@@ -1,4 +1,4 @@
-import { isCalm, isPolitical } from './filters'
+import { explain, politicalMatch, scoreText, threshold, type HiddenKind } from './filters'
 import { sourceMeta } from './sources'
 import type { FeedItem, Settings, Topic } from './types'
 
@@ -50,7 +50,7 @@ export function estimateMinutes(item: FeedItem): number {
 
 export interface FilterOutcome {
   kept: FeedItem[]
-  hidden: { item: FeedItem; reason: 'type' | 'old' | 'seen' | 'politics' | 'calm' | 'short' | 'channel' }[]
+  hidden: { item: FeedItem; reason: 'type' | 'old' | 'seen' | 'politics' | 'calm' | 'short' | 'channel'; kind?: HiddenKind; word?: string }[]
 }
 
 /** Steps 2 + 3: keep only new items, then apply the person's filters. */
@@ -66,9 +66,16 @@ export function filterItems(items: FeedItem[], settings: Settings, seen: Record<
     else if (seen[item.id]) hidden.push({ item, reason: 'seen' })
     else if (item.type === 'video' && settings.skipShorts && item.isShort) hidden.push({ item, reason: 'short' })
     else if (settings.blockedChannels.includes(item.sourceId)) hidden.push({ item, reason: 'channel' })
-    else if (settings.hidePolitics && isPolitical(item.title, item.summary)) hidden.push({ item, reason: 'politics' })
-    else if (!isCalm(item.title, item.summary, settings.strictness, settings.blockWords)) hidden.push({ item, reason: 'calm' })
-    else kept.push(item)
+    else {
+      const politics = settings.hidePolitics ? politicalMatch(item.title, item.summary) : null
+      if (politics) {
+        hidden.push({ item, reason: 'politics', kind: 'politics', word: politics })
+        continue
+      }
+      const score = scoreText(item.title, item.summary, settings.blockWords)
+      if (score.blocked || score.score >= threshold(settings.strictness)) hidden.push({ item, reason: 'calm', ...explain(score.reasons) })
+      else kept.push(item)
+    }
   }
   return { kept, hidden }
 }
@@ -137,11 +144,24 @@ export function orderMixed(items: FeedItem[]): FeedItem[] {
   return out
 }
 
+/** An item the calm or politics filter set aside today (shown in Filters → "Hidden today"). */
+export interface HiddenItem {
+  item: FeedItem
+  kind: HiddenKind
+  word?: string
+}
+const MAX_HIDDEN_LISTED = 20
+
 /** The whole pipeline: filter → pick → order. */
 export function buildDailyFeed(all: FeedItem[], settings: Settings, seen: Record<string, number>, now: number) {
   const { kept, hidden } = filterItems(all, settings, seen, now)
   const picked = orderMixed(pickDaily(kept, settings.minutesPerDay))
-  return { items: picked, hidden }
+  const filtered: HiddenItem[] = hidden
+    .filter((h) => h.kind)
+    .sort((a, b) => b.item.date - a.item.date)
+    .slice(0, MAX_HIDDEN_LISTED)
+    .map((h) => ({ item: h.item, kind: h.kind!, word: h.word }))
+  return { items: picked, hidden, filtered }
 }
 
 /** "Day" key: the feed day starts at settings.openHour local time. */

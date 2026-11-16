@@ -6,7 +6,8 @@ import { useApp } from '../state'
 
 export function Filters() {
   const { t } = useTranslation()
-  const { settings, updateSettings, refresh } = useApp()
+  const { settings, updateSettings, refresh, today, showFiltered } = useApp()
+  const filtered = today?.filtered ?? []
   const [word, setWord] = useState('')
   const change = (patch: Parameters<typeof updateSettings>[0]) => {
     updateSettings(patch)
@@ -63,6 +64,28 @@ export function Filters() {
           </form>
         </section>
 
+        <section className="card pad-card stack-tight" aria-labelledby="hidden-today">
+          <h2 className="card-title" id="hidden-today">{t('hidden.title')}{filtered.length ? ` · ${filtered.length}` : ''}</h2>
+          <p className="muted small">{t('hidden.help')}</p>
+          {filtered.length ? (
+            <ul className="hidden-list">
+              {filtered.map((h) => (
+                <li key={h.item.id} className="hidden-row">
+                  <span className="hidden-text">
+                    <span className="hidden-title">{h.item.title}</span>
+                    <span className="muted small">
+                      {h.item.sourceName} · {t(`hidden.kind.${h.kind}`)}
+                      {h.word ? ` «${h.word === 'ALL CAPS' || h.word === 'caps words' ? t('hidden.caps') : h.word}»` : ''}
+                    </span>
+                  </span>
+                  <button className="pill" onClick={() => showFiltered(h.item.id)}>{t('filters.show')}</button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted small">{t('hidden.none')}</p>
+          )}
+        </section>
       </main>
     </div>
   )

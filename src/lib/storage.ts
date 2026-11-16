@@ -1,4 +1,5 @@
 import { defaultEnabledSources, SUGGESTED_SOURCES, V01_SOURCE_IDS } from './sources'
+import type { HiddenItem } from './feed'
 import type { FeedItem, Lang, Settings } from './types'
 
 /** Small wrapper around localStorage that never throws (private mode, quota, etc.). */
@@ -29,6 +30,7 @@ const K = {
   cache: 'sf.cache.v1',
   channels: 'sf.channels.v1',
   socialSession: 'sf.social.v1',
+  durations: 'sf.durations.v1',
 }
 
 export function detectLang(): Lang {
@@ -96,6 +98,8 @@ export const saveSeen = (s: Record<string, number>) => write(K.seen, s)
 export interface TodayFeed {
   day: string
   items: FeedItem[]
+  /** What the calm/politics filters set aside today. */
+  filtered?: HiddenItem[]
 }
 export const loadToday = () => read<TodayFeed | null>(K.today, null)
 export const saveToday = (t: TodayFeed) => write(K.today, t)
@@ -128,4 +132,11 @@ export function clearAll() {
   } catch {
     memory.clear()
   }
+}
+
+/** Video lengths in seconds, by YouTube video id (so each video's page is read only once). */
+export const loadDurations = () => read<Record<string, number>>(K.durations, {})
+export function saveDurations(d: Record<string, number>) {
+  const entries = Object.entries(d)
+  write(K.durations, Object.fromEntries(entries.slice(Math.max(0, entries.length - 300))))
 }

@@ -1,5 +1,5 @@
-import { findChannelId, findFeedLink, findTitle, parseFeed } from './parse'
-import { loadChannelIds, saveChannelIds } from './storage'
+import { findChannelId, findDurationSeconds, findFeedLink, findTitle, parseFeed } from './parse'
+import { loadChannelIds, loadDurations, saveChannelIds, saveDurations } from './storage'
 import type { FeedItem, Lang, Source } from './types'
 
 const RELAY = '/api/relay'
@@ -101,11 +101,44 @@ export async function fetchSource(source: Source, lang: Lang): Promise<FeedItem[
     case 'youtube': {
       const id = await resolveChannelId(source)
       if (!id) throw new Error('channel not found')
-      return parseFeed(await viaRelay(youtubeFeedUrl(id)), source)
+      return withDurations(parseFeed(await viaRelay(youtubeFeedUrl(id)), source))
     }
     default:
       return fetchRss(source)
   }
+}
+
+const RECENT_MS = 14 * 24 * 60 * 60 * 1000
+const MAX_LOOKUPS_PER_CHANNEL = 4
+
+/**
+ * YouTube's channel feed has no video length, so read it from each recent video's page
+ * (once per video, then cached on the phone). Videos we can't read keep the 10-minute guess.
+ */
+async function withDurations(items: FeedItem[]): Promise<FeedItem[]> {
+  const cache = loadDurations()
+  const now = Date.now()
+  const missing = items
+    .filter((i) => i.videoId && !i.isShort && cache[i.videoId] === undefined && now - i.date < RECENT_MS)
+    .slice(0, MAX_LOOKUPS_PER_CHANNEL)
+  if (missing.length) {
+    await Promise.all(
+      missing.map(async (i) => {
+        try {
+          const secs = findDurationSeconds(await viaRelay(`https://www.youtube.com/watch?v=${encodeURIComponent(i.videoId!)}`))
+          if (secs) cache[i.videoId!] = secs
+        } catch {
+          /* keep the guess */
+        }
+      }),
+    )
+    saveDurations({ ...loadDurations(), ...cache })
+  }
+  return items.map((i) => {
+    const secs = i.videoId ? cache[i.videoId] : undefined
+    if (!secs) return i
+    return { ...i, minutes: Math.max(1, Math.round(secs / 60)), isShort: i.isShort || secs <= 60 }
+  })
 }
 
 /** RSS/Atom. If the feed URL breaks and the source has a home page, find the feed there (and remember it). */

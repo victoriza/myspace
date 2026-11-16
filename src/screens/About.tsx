@@ -4,7 +4,7 @@ import { go } from '../router'
 
 /** Victor's LinkedIn profile ("Say hi on LinkedIn"). */
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/victoriza/'
-export const APP_VERSION = '0.2.0'
+export const APP_VERSION = '0.3.0'
 
 export function About() {
   const { t } = useTranslation()

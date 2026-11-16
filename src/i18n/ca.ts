@@ -12,6 +12,13 @@ export const ca: typeof es = {
     toast: 'Font eliminada',
     undo: 'Desfer',
   },
+  hidden: {
+    title: 'Amagat avui',
+    help: 'El que el filtre ha apartat avui. Si alguna cosa no s’havia d’amagar, mostra-la i apareixerà al final del teu feed.',
+    none: 'Res amagat avui.',
+    caps: 'MAJÚSCULES',
+    kind: { politics: 'Política', blocked: 'Paraula bloquejada', pseudo: 'Pseudociència', hype: 'Exageració', clickbait: 'Clickbait', style: 'Estil sensacionalista' },
+  },
   types: { news: 'Notícies', video: 'Vídeos', newsletter: 'Butlletins', tech: 'Tecnologia', picture: 'Imatges', all: 'Tot' },
   typesDetail: {
     news: 'Bones notícies i solucions',

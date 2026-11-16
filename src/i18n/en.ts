@@ -12,6 +12,13 @@ export const en: typeof es = {
     toast: 'Source removed',
     undo: 'Undo',
   },
+  hidden: {
+    title: 'Hidden today',
+    help: 'What the filter set aside today. If something shouldn’t be hidden, show it and it will appear at the end of your feed.',
+    none: 'Nothing hidden today.',
+    caps: 'ALL CAPS',
+    kind: { politics: 'Politics', blocked: 'Blocked word', pseudo: 'Pseudoscience', hype: 'Hype', clickbait: 'Clickbait', style: 'Sensational style' },
+  },
   types: { news: 'News', video: 'Videos', newsletter: 'Newsletters', tech: 'Tech', picture: 'Pictures', all: 'All' },
   typesDetail: {
     news: 'Good news and solutions',

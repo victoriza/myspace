@@ -10,7 +10,9 @@ function relayDev(): Plugin {
     configureServer(server) {
       server.middlewares.use('/api/relay', async (req, res) => {
         const mod = await server.ssrLoadModule('/api/relay.ts')
-        const response: Response = await mod.GET(new Request('http://localhost' + req.originalUrl))
+        const headers = new Headers()
+        for (const [k, v] of Object.entries(req.headers)) if (typeof v === 'string') headers.set(k, v)
+        const response: Response = await mod.GET(new Request('http://' + (req.headers.host || 'localhost') + req.originalUrl, { headers }))
         res.statusCode = response.status
         response.headers.forEach((v, k) => res.setHeader(k, v))
         res.end(Buffer.from(await response.arrayBuffer()))

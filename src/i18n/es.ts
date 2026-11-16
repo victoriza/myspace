@@ -10,6 +10,13 @@ export const es = {
     toast: 'Fuente quitada',
     undo: 'Deshacer',
   },
+  hidden: {
+    title: 'Ocultado hoy',
+    help: 'Lo que el filtro ha apartado hoy. Si algo no debía ocultarse, muéstralo y aparecerá al final de tu feed.',
+    none: 'Nada ocultado hoy.',
+    caps: 'MAYÚSCULAS',
+    kind: { politics: 'Política', blocked: 'Palabra bloqueada', pseudo: 'Pseudociencia', hype: 'Exageración', clickbait: 'Clickbait', style: 'Estilo sensacionalista' },
+  },
   types: { news: 'Noticias', video: 'Vídeos', newsletter: 'Newsletters', tech: 'Tecnología', picture: 'Imágenes', all: 'Todo' },
   typesDetail: {
     news: 'Buenas noticias y soluciones',

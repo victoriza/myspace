@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { lookAt, luminance, sceneAt } from './sky'
+import { contrast, lookAt, luminance, sceneAt, skyColorAt, skyText } from './sky'
 
 const at = (h: number, m = 0) => new Date(2026, 10, 16, h, m)
 
@@ -34,5 +34,29 @@ describe('home sky', () => {
     expect(sceneAt(at(23), 200).darkGround).toBe(true)
     expect(sceneAt(at(13), 200).darkGround).toBe(false)
     expect(luminance('#ffffff')).toBeCloseTo(1)
+  })
+})
+
+describe('home sky contrast, every 15 minutes of the day', () => {
+  const horizon = 200
+  const H = horizon + 20
+  const slots = Array.from({ length: 96 }, (_, i) => at(Math.floor(i / 4), (i % 4) * 15))
+  it('title, greeting, its line and the status line stay readable (WCAG AA)', () => {
+    const fails: string[] = []
+    for (const d of slots) {
+      const s = sceneAt(d, horizon)
+      const c = skyText(s, horizon)
+      const label = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`
+      const check = (what: string, fg: string, bg: string, min: number) => {
+        const r = contrast(fg, bg)
+        if (r < min) fails.push(`${label} ${what} ${r.toFixed(2)}`)
+      }
+      check('title', c.heroInk, skyColorAt(s.look, 30, H), 3) // 22 px bold
+      check('greeting', c.heroInk, skyColorAt(s.look, 70, H), 3) // 26 px
+      check('greeting line', c.heroSub, skyColorAt(s.look, 100, H), 4.5) // 14 px
+      check('status', c.seaInk, s.look.sea, 4.5)
+      check('status strong', c.seaStrong, s.look.sea, 4.5)
+    }
+    expect(fails).toEqual([])
   })
 })

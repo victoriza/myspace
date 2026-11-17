@@ -108,3 +108,42 @@ export function skyColorAt(look: SkyLook, y: number, height: number): string {
   while (i < 2 && f > stops[i + 1]) i++
   return mix(look.sky[i], look.sky[i + 1], (f - stops[i]) / (stops[i + 1] - stops[i]))
 }
+
+/** WCAG contrast ratio between two colours. */
+export function contrast(a: string, b: string): number {
+  const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m)
+  return (x + 0.05) / (y + 0.05)
+}
+
+const LIGHT_INK = '#ffffff'
+const DARK_INK = '#0b1020'
+function bestInk(bg: string): string {
+  const light = contrast(LIGHT_INK, bg)
+  const dark = contrast(DARK_INK, bg)
+  if (Math.max(light, dark) >= 4.5) return light >= dark ? LIGHT_INK : DARK_INK
+  // Mid-tones (a few minutes around dawn/dusk): pure black always reaches 4.5:1 where white doesn't.
+  return light >= contrast('#000000', bg) ? LIGHT_INK : '#000000'
+}
+/** A softer second colour if it stays readable (4.5:1), else the main one. */
+function softInk(ink: string, bg: string): string {
+  const soft = ink === LIGHT_INK ? mix(bg, LIGHT_INK, 0.85) : ink === DARK_INK ? '#3e4859' : ink
+  return contrast(soft, bg) >= 4.5 ? soft : ink
+}
+
+/**
+ * Text colours for the sky and the sea, picked for contrast at this exact time
+ * (checked every 15 minutes of the day in the tests).
+ */
+export function skyText(scene: SkyScene, horizon: number) {
+  const H = horizon + 20
+  const greetingBg = skyColorAt(scene.look, 100, H)
+  const heroInk = bestInk(skyColorAt(scene.look, 60, H))
+  const seaInk = bestInk(scene.look.sea)
+  return {
+    heroInk,
+    heroSub: softInk(bestInk(greetingBg), greetingBg),
+    seaStrong: seaInk,
+    seaInk: softInk(seaInk, scene.look.sea),
+    light: heroInk === LIGHT_INK,
+  }
+}

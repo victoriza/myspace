@@ -11,6 +11,7 @@
 - Languages: Spanish (default), English, Catalan. Every string goes in `src/i18n/{es,en,ca}.ts`.
 - Everything runs on the phone: no API keys, no logins. The only server piece is `api/relay.ts` (CORS relay).
 - Subtle UI: small, quiet controls; nothing that pushes the person to stay longer.
+- Accessible: landmarks on every screen (header / main / nav), screen changes set the tab title and focus the h1, foreign-language titles carry `lang`, 44 px touch targets, text over the sky picked for WCAG AA contrast (tested every 15 min of the day), layouts wrap at 200% text. Check with axe before releasing.
 - Cosy motion: slow, soft, play-once animations (sun and waves language); nothing loops for attention; everything respects "reduce motion".
 
 ## Code map
@@ -22,6 +23,7 @@
 - `src/state.tsx` — app state and refresh; `src/screens/` — screens.
 - `src/lib/daytime.ts` + `src/components/Cosy.tsx` — time-of-day greeting, living logo, warm palette (`<html data-daypart>`), mini loader.
 - `src/lib/sky.ts` + `src/components/Sky.tsx` — the home sky: four looks (dawn, day, sunset, night) blended by the hour, sun arc / moon / stars / clouds, waves on the horizon (measured under the chips in `Feed.tsx`), light text and dark page at night.
+- `seo/landing.ts` — build-time landing pages for Google and link previews (`/`, `/en/`, `/ca/` at https://myspace.victoriza.com): titles, descriptions, hreflang, canonical, Open Graph image (`public/og-image.png`), JSON-LD; `public/robots.txt`, `public/sitemap.xml`. Opening `/en/` or `/ca/` starts the app in that language.
 - `src/lib/update.ts` + `src/components/Updates.tsx` — new-version notice (service worker in "prompt" mode) and the one-time "What's new" card.
 - Tests: `npm test` (Vitest). Build: `npm run build`.
 

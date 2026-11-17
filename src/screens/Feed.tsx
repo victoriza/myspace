@@ -4,12 +4,12 @@ import { BottomNav, Icon, Switch, TypeTag } from '../components/ui'
 import { UpdateBar, WhatsNew } from '../components/Updates'
 import { Greeting, LivingLogo, MiniLoader } from '../components/Cosy'
 import { SkyBackdrop } from '../components/Sky'
-import { luminance, sceneAt, skyColorAt } from '../lib/sky'
+import { sceneAt, skyColorAt, skyText } from '../lib/sky'
 import { totalMinutes } from '../lib/feed'
 import { timeAgo } from '../lib/time'
 import type { ContentType, FeedItem } from '../lib/types'
 import { go } from '../router'
-import { sourceMeta } from '../lib/sources'
+import { itemLang, sourceMeta } from '../lib/sources'
 import { useApp } from '../state'
 
 export function Feed() {
@@ -52,34 +52,36 @@ export function Feed() {
   }, [])
   const scene = sceneAt(now, horizon)
   const L = scene.look
-  const seaLight = luminance(L.sea) < 0.3
+  // Text colours are picked for contrast at this exact time (tested every 15 min of the day).
+  const ink = skyText(scene, horizon)
   const skyVars = {
-    '--hero-ink': scene.lightText ? '#FFFFFF' : '#172036',
-    '--hero-sub': scene.lightText ? 'rgba(255,255,255,0.82)' : '#4A5468',
-    '--sea-ink': seaLight ? 'rgba(255,255,255,0.86)' : '#4A5468',
-    '--sea-strong': seaLight ? '#FFFFFF' : '#172036',
+    '--hero-ink': ink.heroInk,
+    '--hero-sub': ink.heroSub,
+    '--sea-ink': ink.seaInk,
+    '--sea-strong': ink.seaStrong,
     '--card-bg': L.card,
     '--stuck-bg': `linear-gradient(180deg, ${skyColorAt(L, 0, horizon + 20)}, ${skyColorAt(L, chipsH, horizon + 20)})`,
   } as CSSProperties
 
   return (
-    <div className={`screen with-nav sky-home${scene.lightText ? ' sky-light' : ''}${scene.darkGround ? ' sky-dark' : ''}`} style={skyVars}>
+    <div className={`screen with-nav sky-home${ink.light ? ' sky-light' : ''}${scene.darkGround ? ' sky-dark' : ''}`} style={skyVars}>
       <SkyBackdrop scene={scene} horizon={horizon} />
-      <div ref={heroRef} className="sky-hero">
-      <header className="feed-header">
+      <header ref={heroRef} className="sky-hero">
+      <div className="feed-header">
         <div className="brand">
           <LivingLogo />
           <h1>Space Feed</h1>
         </div>
-      </header>
+      </div>
 
       <Greeting />
       <UpdateBar />
-      </div>
+      </header>
 
+      <main className="feed-main">
       <div ref={sentinelRef} className="chips-sentinel" aria-hidden="true" />
       {presentTypes.length > 1 ? (
-        <div ref={chipsRef} className={`chips sky-chips${stuck ? ' stuck' : ''}`} role="radiogroup" aria-label={t('types.all')}>
+        <div ref={chipsRef} className={`chips sky-chips${stuck ? ' stuck' : ''}`} role="radiogroup" aria-label={t('feed.show')}>
           {(['all', ...presentTypes] as const).map((type) => (
             <button key={type} role="radio" aria-checked={filter === type} className={`chip ${filter === type ? 'on' : ''}`} onClick={() => setFilter(type)}>
               {t(`types.${type}`)}
@@ -103,7 +105,7 @@ export function Feed() {
       {loading && today ? <MiniLoader /> : null}
       {failedSources.length ? <p className="muted small pad-x">{t('feed.refreshError')}</p> : null}
 
-      <main className="stack">
+      <div className="stack">
         <WhatsNew />
         {fresh.map((item, i) => (
           <Card key={item.id} item={item} isSeen={!!seen[item.id]} cardRef={register(item.id, !!seen[item.id])} arriveIndex={arrive ? i : undefined} />
@@ -136,6 +138,7 @@ export function Feed() {
             <button className="btn-primary" onClick={() => go('sources')}>{t('feed.addSources')}</button>
           </div>
         ) : null}
+      </div>
       </main>
       <BottomNav active="feed" />
     </div>
@@ -147,7 +150,7 @@ export function Feed() {
  * Also tells when the chips have stuck to the top, so they get a sky-coloured background.
  */
 function useHorizon(layoutKey: string) {
-  const heroRef = useRef<HTMLDivElement | null>(null)
+  const heroRef = useRef<HTMLElement | null>(null)
   const chipsRef = useRef<HTMLDivElement | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
   const [horizon, setHorizon] = useState(200)
@@ -159,7 +162,8 @@ function useHorizon(layoutKey: string) {
       const hero = heroRef.current
       if (!hero) return
       const chips = chipsRef.current
-      const bottom = chips ? chips.offsetTop + chips.offsetHeight : hero.offsetTop + hero.offsetHeight
+      const box = (chips ?? hero).getBoundingClientRect()
+      const bottom = box.bottom + window.scrollY
       setHorizon(Math.round(bottom + 4))
       if (chips) setChipsH(chips.offsetHeight)
     }
@@ -241,6 +245,7 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
   const lang = i18n.language as 'es' | 'en' | 'ca'
   const open = () => go(item.type === 'video' && item.videoId ? 'video' : 'article', item.id)
   const angle = sourceMeta(item.sourceId)?.angle
+  const textLang = itemLang(item.sourceId, lang)
   const arriveCls = arriveIndex !== undefined ? ' arrive' : ''
   const arriveStyle = arriveIndex !== undefined ? { animationDelay: `${Math.min(arriveIndex, 7) * 70}ms` } : undefined
   const seenMark = isSeen ? (
@@ -272,7 +277,7 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
         </span>
         <span className="video-text">
           {videoMeta}
-          <span className="title">{item.title}</span>
+          <span className="title" lang={textLang}>{item.title}</span>
         </span>
       </button>
     )
@@ -284,7 +289,7 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
         <span className="picture" style={item.image ? { backgroundImage: `url("${item.image}")` } : undefined} />
         <span className="picture-text">
           {meta}
-          <span className="title">{item.title}</span>
+          <span className="title" lang={textLang}>{item.title}</span>
         </span>
       </button>
     )
@@ -293,8 +298,8 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
   return (
     <button ref={cardRef} className={`card text-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
       {meta}
-      <span className="title">{item.title}</span>
-      {item.summary ? <span className="summary">{item.summary}</span> : null}
+      <span className="title" lang={textLang}>{item.title}</span>
+      {item.summary ? <span className="summary" lang={textLang}>{item.summary}</span> : null}
     </button>
   )
 }

@@ -10,7 +10,7 @@ export function NextBar({ currentId }: { currentId: string }) {
   const { today, seen } = useApp()
   const next = today ? nextItem(today.items, currentId, seen) : null
   return (
-    <div className="sticky-bottom next-bar">
+    <nav className="sticky-bottom next-bar" aria-label={t('article.next')}>
       {next ? (
         <button className="btn-primary" onClick={() => openItem(next, true)}>
           <span className="next-label">{t('article.next')}</span>
@@ -20,6 +20,6 @@ export function NextBar({ currentId }: { currentId: string }) {
         <button className="btn-sun big" onClick={() => goReplace('done')}>{t('article.finish')}</button>
       )}
       {next ? <span className="next-title muted small">{next.title}</span> : null}
-    </div>
+    </nav>
   )
 }

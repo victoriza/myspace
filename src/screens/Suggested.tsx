@@ -30,8 +30,8 @@ export function Suggested() {
   return (
     <div className="screen">
       <Header title={t('suggested.title')} onBack={firstRun ? () => go('why') : back} />
-      <p className="screen-intro">{t('suggested.subtitle')}</p>
       <main className="stack">
+        <p className="screen-intro">{t('suggested.subtitle')}</p>
         {CONTENT_TYPES.map((type) => {
           const list = SUGGESTED_SOURCES.filter((s) => s.type === type)
           if (!list.length) return null

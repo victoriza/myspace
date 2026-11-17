@@ -35,7 +35,10 @@ export function Greeting() {
   const part = dayPart()
   return (
     <div className="greeting">
-      <p className="greeting-hello">{t(`greeting.${part}`)}</p>
+      <p className="greeting-hello">
+        {t(`greeting.${part}`)}
+        {part !== 'afternoon' ? <span aria-hidden="true">{part === 'morning' ? ' ☀️' : ' 🌙'}</span> : null}
+      </p>
       <p className="greeting-line muted small">{t(`greeting.${part}Line`)}</p>
     </div>
   )

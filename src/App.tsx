@@ -90,8 +90,28 @@ export default function App() {
   // (No transform on screens with the fixed bottom bar, so it doesn't jump.)
   const slide = page === 'article' || page === 'video'
   return (
-    <div key={route.join('/') || 'feed'} className={`page${slide ? ' page-slide' : ''}`}>
+    <div key={route.join('/') || 'feed'} ref={announceScreen} className={`page${slide ? ' page-slide' : ''}`}>
       {content}
     </div>
   )
+}
+
+/**
+ * When the screen changes: name the browser tab after it and move focus to its heading,
+ * so screen readers say where you are. (Not on the very first screen, to keep the normal start.)
+ */
+let firstScreen = true
+function announceScreen(el: HTMLDivElement | null) {
+  if (!el) return
+  const heading = el.querySelector('h1')
+  const name = heading?.textContent?.trim()
+  document.title = name && name !== 'Space Feed' ? `${name} · Space Feed` : 'Space Feed'
+  if (firstScreen) {
+    firstScreen = false
+    return
+  }
+  if (heading instanceof HTMLElement) {
+    heading.setAttribute('tabindex', '-1')
+    heading.focus({ preventScroll: true })
+  }
 }

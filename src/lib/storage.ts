@@ -34,6 +34,10 @@ const K = {
 }
 
 export function detectLang(): Lang {
+  // Arrived on the English or Catalan landing page (/en/, /ca/): start in that language.
+  const path = typeof location !== 'undefined' ? location.pathname : '/'
+  if (path.startsWith('/en')) return 'en'
+  if (path.startsWith('/ca')) return 'ca'
   const langs = typeof navigator !== 'undefined' ? navigator.languages || [navigator.language] : []
   for (const l of langs) {
     const code = (l || '').slice(0, 2).toLowerCase()

@@ -85,3 +85,10 @@ export const interestOf = (topic: Topic): Topic => (topic === 'nature' ? 'scienc
 
 /** Topics covered by an interest. */
 export const topicsOfInterest = (interest: Topic): Topic[] => (interest === 'science' ? ['science', 'nature'] : [interest])
+
+/** Language of an item's text when it differs from the app's (so screen readers pronounce it right). */
+export function itemLang(sourceId: string, appLang: Lang): Lang | undefined {
+  const s = sourceMeta(sourceId)
+  if (!s || s.kind === 'wikipedia' || s.lang === appLang) return undefined
+  return s.lang
+}

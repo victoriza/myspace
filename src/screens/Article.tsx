@@ -8,6 +8,7 @@ import { NextBar } from '../components/NextBar'
 import { RemoveSource } from '../components/RemoveSource'
 import { back, go } from '../router'
 import { useApp } from '../state'
+import { itemLang } from '../lib/sources'
 
 const SIZES = [16, 18, 21]
 
@@ -42,6 +43,7 @@ export function Article({ id }: { id: string }) {
   const site = hostOf(item.link)
   const minutes = readingMinutes(html ? html.replace(/<[^>]+>/g, ' ') : item.summary)
 
+  const textLang = itemLang(item.sourceId, i18n.language as 'es')
   return (
     <div className="screen reader">
       <header className="reader-header">
@@ -58,21 +60,21 @@ export function Article({ id }: { id: string }) {
             {html ? ` · ${t('article.minRead', { count: minutes })}` : ''}
           </span>
         </span>
-        <h1 className="reader-title">{item.title}</h1>
+        <h1 className="reader-title" lang={textLang}>{item.title}</h1>
         {item.author ? <p className="muted small">{item.author}</p> : null}
 
         {item.summary && item.type !== 'picture' ? (
           <div className="in-short">
             <span className="in-short-label">{t('article.inShort')}</span>
-            <span>{firstSentence(item.summary)}</span>
+            <span lang={textLang}>{firstSentence(item.summary)}</span>
           </div>
         ) : null}
 
         {html ? (
-          <div className="reader-content" style={{ fontSize: SIZES[size] }} dangerouslySetInnerHTML={{ __html: html }} />
+          <div className="reader-content" lang={textLang} style={{ fontSize: SIZES[size] }} dangerouslySetInnerHTML={{ __html: html }} />
         ) : (
           <div className="stack-tight">
-            {item.summary ? <p className="reader-content" style={{ fontSize: SIZES[size] }}>{item.summary}</p> : null}
+            {item.summary ? <p className="reader-content" lang={textLang} style={{ fontSize: SIZES[size] }}>{item.summary}</p> : null}
             {item.type !== 'picture' ? <p className="muted small">{t('article.summaryOnly')}</p> : null}
           </div>
         )}

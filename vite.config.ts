@@ -2,6 +2,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { seoLanding } from './seo/landing.ts'
 
 /** Runs api/relay.ts inside `npm run dev`, so the app works locally without the Vercel CLI. */
 function relayDev(): Plugin {
@@ -25,19 +26,20 @@ export default defineConfig({
   plugins: [
     react(),
     relayDev(),
+    seoLanding(),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Space Feed',
         short_name: 'Space Feed',
-        description: 'A calm daily feed: good news, videos and ideas — then it ends.',
+        description: 'Un feed tranquilo que se acaba: buenas noticias, ciencia y vídeos tranquilos.',
         lang: 'es',
         start_url: '/',
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#F6F5F1',
+        background_color: '#F7F3EA',
         theme_color: '#1E2952',
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

@@ -6,7 +6,7 @@ export function Done() {
   const { t } = useTranslation()
   const { settings } = useApp()
   return (
-    <div className="done">
+    <main className="done">
       <div className="done-sky-warm" aria-hidden="true" />
       <div className="stars done-stars" aria-hidden="true">
         {[[13, 90], [41, 60], [72, 120], [87, 200], [25, 180], [58, 30], [93, 110], [6, 250]].map(([x, y], k) => (
@@ -33,6 +33,6 @@ export function Done() {
         <div className="opens">{t('done.opens', { hour: settings.openHour })}</div>
         <button className="btn-link light" onClick={() => go()}>{t('done.lookBack')}</button>
       </div>
-    </div>
+    </main>
   )
 }

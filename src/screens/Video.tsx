@@ -6,6 +6,7 @@ import { NextBar } from '../components/NextBar'
 import { RemoveSource } from '../components/RemoveSource'
 import { back, go } from '../router'
 import { useApp } from '../state'
+import { itemLang } from '../lib/sources'
 
 export function Video({ id }: { id: string }) {
   const { t, i18n } = useTranslation()
@@ -36,7 +37,7 @@ export function Video({ id }: { id: string }) {
       <div className="player">
         <iframe
           src={src}
-          title={item.title}
+          title={`YouTube: ${item.title}`}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
           allowFullScreen
@@ -47,7 +48,7 @@ export function Video({ id }: { id: string }) {
           <TypeTag type="video" />
           <span className="muted">{item.sourceName} · {timeAgo(item.date, i18n.language as 'es')}</span>
         </span>
-        <h1 className="video-title">{item.title}</h1>
+        <h1 className="video-title" lang={itemLang(item.sourceId, i18n.language as 'es')}>{item.title}</h1>
         {item.summary ? <p className="muted clamp-3">{item.summary}</p> : null}
 
         <div className="grid-2">

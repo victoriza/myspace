@@ -14,7 +14,7 @@ export function Why() {
 
   return (
     <div className="screen why">
-      <div className="why-hero">
+      <header className="why-hero">
         <svg className="why-sun" aria-hidden="true" width="130" height="130" viewBox="0 0 140 140">
           <circle cx="70" cy="62" r="34" fill="#E9B949" />
           <path d="M10 100c20-14 40 14 60 0s40 14 60 0M10 118c20-14 40 14 60 0s40 14 60 0" stroke="#FFFFFF" strokeOpacity="0.7" strokeWidth="5" fill="none" strokeLinecap="round" />
@@ -29,7 +29,7 @@ export function Why() {
         </div>
         <h1>{t('why.title')}</h1>
         <p>{t('why.intro')}</p>
-      </div>
+      </header>
 
       <main className="why-list">
         {principles.map(([title, body], i) => (
@@ -44,9 +44,9 @@ export function Why() {
       </main>
 
       {firstRun ? (
-        <div className="why-bottom">
+        <footer className="why-bottom">
           <button className="btn-primary" onClick={() => go('suggested')}>{t('why.start')}</button>
-        </div>
+        </footer>
       ) : null}
     </div>
   )

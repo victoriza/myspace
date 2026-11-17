@@ -6,6 +6,23 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.8.0',
+    notes: {
+      es: [
+        'Más accesible: cada pantalla se anuncia al lector de pantalla, los títulos en otro idioma se leen bien y todo cabe con letra grande.',
+        'Textos más cortos y claros, y un cielo que siempre se lee bien, a cualquier hora.',
+      ],
+      en: [
+        'More accessible: each screen is announced to screen readers, titles in other languages are read correctly and everything fits with large text.',
+        'Shorter, clearer copy, and a sky that stays readable at any hour.',
+      ],
+      ca: [
+        'Més accessible: cada pantalla s’anuncia al lector de pantalla, els títols en altres idiomes es llegeixen bé i tot hi cap amb lletra gran.',
+        'Textos més curts i clars, i un cel que sempre es llegeix bé, a qualsevol hora.',
+      ],
+    },
+  },
+  {
     version: '0.7.0',
     notes: {
       es: [

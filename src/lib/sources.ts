@@ -39,17 +39,17 @@ export const SUGGESTED_SOURCES: Source[] = [
   // YouTube channels
   { id: 'yt-kurzgesagt', name: 'Kurzgesagt', lang: 'en', type: 'video', kind: 'youtube', channelId: 'UCsXVk37bltHxD1rDPwtNM8Q', topic: 'science', defaultOn: true },
   { id: 'yt-kurzgesagt-es', name: 'En Pocas Palabras', lang: 'es', type: 'video', kind: 'youtube', handle: '@kurzgesagt_es', topic: 'science', defaultOn: true },
-  { id: 'yt-3b1b', name: '3Blue1Brown', lang: 'en', type: 'video', kind: 'youtube', handle: '@3blue1brown', topic: 'science' },
-  { id: 'yt-curiosamente', name: 'CuriosaMente', lang: 'es', type: 'video', kind: 'youtube', handle: '@curiosamente', topic: 'science', defaultOn: true },
+  { id: 'yt-3b1b', name: '3Blue1Brown', lang: 'en', type: 'video', kind: 'youtube', channelId: 'UCYO_jab_esuFRV4b17AJtAw', topic: 'science' },
+  { id: 'yt-curiosamente', name: 'CuriosaMente', lang: 'es', type: 'video', kind: 'youtube', channelId: 'UCX16cLWl6dCjlZMgUBxgGkA', topic: 'science', defaultOn: true },
   { id: 'yt-quantumfracture', name: 'QuantumFracture', lang: 'es', type: 'video', kind: 'youtube', handle: '@QuantumFracture', topic: 'science' },
   { id: 'yt-cdeciencia', name: 'CdeCiencia', lang: 'es', type: 'video', kind: 'youtube', handle: '@CdeCiencia', topic: 'science' },
-  { id: 'yt-teded', name: 'TED-Ed', lang: 'en', type: 'video', kind: 'youtube', handle: '@TEDEd', topic: 'culture' },
-  { id: 'yt-minutephysics', name: 'MinutePhysics', lang: 'en', type: 'video', kind: 'youtube', handle: '@minutephysics', topic: 'science' },
+  { id: 'yt-teded', name: 'TED-Ed', lang: 'en', type: 'video', kind: 'youtube', channelId: 'UCsooa4yRKGN_zEE8iknghZA', topic: 'culture' },
+  { id: 'yt-minutephysics', name: 'MinutePhysics', lang: 'en', type: 'video', kind: 'youtube', channelId: 'UCUHW94eEFW7hkUMVaZz4eDg', topic: 'science' },
   // Videogames — off until "Videojuegos" is switched on in Interests. Craft and culture, not hype.
   { id: 'game-developer', name: 'Game Developer', lang: 'en', type: 'news', kind: 'rss', url: 'https://www.gamedeveloper.com/rss.xml', site: 'https://www.gamedeveloper.com/', topic: 'games', onWithTopic: true },
   { id: 'devuego', name: 'DeVuego', lang: 'es', type: 'news', kind: 'rss', url: 'https://www.devuego.es/blog/feed/', site: 'https://www.devuego.es/blog/', topic: 'games', onWithTopic: true },
   { id: 'anaitgames', name: 'AnaitGames', lang: 'es', type: 'news', kind: 'rss', url: 'https://www.anaitgames.com/feed', site: 'https://www.anaitgames.com/', topic: 'games', onWithTopic: true },
-  { id: 'yt-gmtk', name: "Game Maker's Toolkit", lang: 'en', type: 'video', kind: 'youtube', handle: '@GMTK', topic: 'games', onWithTopic: true },
+  { id: 'yt-gmtk', name: "Game Maker's Toolkit", lang: 'en', type: 'video', kind: 'youtube', channelId: 'UCqJ-Xo29CKyLTjn6z2XwYAw', topic: 'games', onWithTopic: true },
   { id: 'yt-noclip', name: 'Noclip', lang: 'en', type: 'video', kind: 'youtube', handle: '@NoclipDocs', topic: 'games', onWithTopic: true },
   { id: 'yt-dayoscript', name: 'Dayoscript', lang: 'es', type: 'video', kind: 'youtube', handle: '@Dayoscript', topic: 'games', onWithTopic: true },
 ]

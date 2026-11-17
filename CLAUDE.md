@@ -15,10 +15,10 @@
 - Cosy motion: slow, soft, play-once animations (sun and waves language); nothing loops for attention; everything respects "reduce motion".
 
 ## Code map
-- `src/lib/feed.ts` — daily pipeline: filter → pick (time budget, ≥2 pictures, per-source/topic/video caps) → order; also the "Hidden today" list.
+- `src/lib/feed.ts` — daily pipeline: filter → pick (time budget, reserve ≥2 pictures and 1–2 videos, per-source/topic caps) → order; also the "Hidden today" list.
 - `src/lib/filters.ts` — calm filter (clickbait, hype, game guides, pseudoscience) and politics filter.
 - `src/lib/sources.ts` — suggested sources with topic and angle; Interests (Customize) switch topics and their sources (`topicsOff`; videogames start off).
-- `src/lib/fetchers.ts` — fetching through the relay, feed discovery, YouTube video lengths.
+- `src/lib/fetchers.ts` — fetching through the relay, feed discovery, YouTube video lengths. YouTube uses the channel's videos-only playlist (`UULF…`, no Shorts) with the channel feed as fallback; suggested channels store their channel ID where verified. A source that fails keeps showing its last good items.
 - `api/relay.ts` — same-origin only, rate-limited per IP, 3 MB cap, no private hosts.
 - `src/state.tsx` — app state and refresh; `src/screens/` — screens.
 - `src/lib/daytime.ts` + `src/components/Cosy.tsx` — time-of-day greeting, living logo, warm palette (`<html data-daypart>`), mini loader.

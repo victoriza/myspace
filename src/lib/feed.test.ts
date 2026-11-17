@@ -79,8 +79,8 @@ describe('feed pipeline', () => {
   it('shows what is new only for versions newer than the last one seen', () => {
     expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
     expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
-    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.8.0', '0.7.0'])
-    expect(notesSince('0.8.0')).toEqual([])
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.8.1', '0.8.0'])
+    expect(notesSince('0.8.1')).toEqual([])
   })
 
   it('leaves out switched-off interests (videogames start off)', () => {
@@ -94,6 +94,23 @@ describe('feed pipeline', () => {
 
   it('switching videogames on brings its sources', () => {
     expect(sourcesForTopic('games', 'es')).toEqual(['game-developer', 'devuego', 'anaitgames', 'yt-gmtk', 'yt-noclip', 'yt-dayoscript'])
+  })
+
+  it('reserves videos like pictures, even when newer news would fill the day', () => {
+    const H = 3600e3
+    const news = Array.from({ length: 14 }, (_, i) => item(i, { sourceId: 'n' + (i % 7), date: now - i * H }))
+    const pics = [item(30, { type: 'picture', sourceId: 'apod', date: now - 20 * H }), item(31, { type: 'picture', sourceId: 'wiki', date: now - 13 * H })]
+    const vids = [
+      item(40, { type: 'video', sourceId: 'kurz', minutes: 12, date: now - 50 * H }),
+      item(41, { type: 'video', sourceId: 'curio', minutes: 9, date: now - 30 * H }),
+      item(42, { type: 'video', sourceId: 'mini', minutes: 4, date: now - 80 * H }),
+    ]
+    const all = [...news, ...pics, ...vids]
+    const videosAt = (b: number) => pickDaily(all, b).filter((i) => i.type === 'video').map((i) => i.id)
+    expect(videosAt(10)).toEqual(['i42']) // 10 min: only the 4-min one fits next to 2 pictures
+    expect(videosAt(20)[0]).toBe('i41') // 20 min: the newest video that fits (+ a short 2nd one if ≥5 min stay to read)
+    expect(videosAt(30).length).toBe(2) // 30 min: two, still ≥5 min to read
+    for (const b of [10, 20, 30]) expect(totalMinutes(pickDaily(all, b))).toBeLessThanOrEqual(b)
   })
 
   it('never puts two videos in a row when it can avoid it', () => {

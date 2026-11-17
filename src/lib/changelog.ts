@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.8.1',
+    notes: {
+      es: ['Vuelven los vídeos: cada día tiene su hueco para 1 o 2, como las imágenes, y ya no se cuelan Shorts.'],
+      en: ['Videos are back: each day keeps a place for 1 or 2, like pictures, and no more Shorts sneaking in.'],
+      ca: ['Tornen els vídeos: cada dia té lloc per a 1 o 2, com les imatges, i ja no s’hi colen Shorts.'],
+    },
+  },
+  {
     version: '0.8.0',
     notes: {
       es: [

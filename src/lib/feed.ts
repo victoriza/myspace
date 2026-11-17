@@ -16,6 +16,10 @@ const PER_SOURCE_CAP = 3
 const MAX_VIDEOS_PER_DAY = 2
 /** Pictures are short (≈1 min) and calm: keep at least this many in every day. */
 export const MIN_PICTURES_PER_DAY = 2
+/** Like pictures, videos get a reserved place: 1 a day, a 2nd when it still leaves time to read. */
+export const RESERVED_VIDEOS = 2
+const MAX_VIDEO_MINUTES = 20
+const READING_LEFT_FOR_2ND_VIDEO = 5
 /** No subject (science, planet, progress…) may take more than this share of the day's reading time… */
 const TOPIC_SHARE = 0.4
 /** …but always allow at least this many minutes of it. */
@@ -83,7 +87,7 @@ export function filterItems(items: FeedItem[], settings: Settings, seen: Record<
 }
 
 /**
- * Step 4: fill the daily time budget — at least MIN_PICTURES_PER_DAY pictures, then newest first,
+ * Step 4: fill the daily time budget — reserve MIN_PICTURES_PER_DAY pictures and 1–2 videos, then newest first,
  * at most PER_SOURCE_CAP per source, no topic over TOPIC_SHARE of the time,
  * at most MAX_VIDEOS_PER_DAY videos, no video over 20 min. Items that don't fit are skipped
  * so a shorter one can still use the remaining time.
@@ -108,12 +112,28 @@ export function pickDaily(items: FeedItem[], budgetMinutes: number, getTopic: (i
     picked.push(item)
     used += mins
   }
+  // Then videos (they're days older than the news, so newest-first would never reach them):
+  // newest first, one per channel, each must fit; the 2nd only if ≥5 min stay for reading.
+  const channelsUsed = new Set<string>()
+  for (const item of sorted) {
+    if (videos >= RESERVED_VIDEOS) break
+    if (item.type !== 'video' || channelsUsed.has(item.sourceId)) continue
+    const mins = estimateMinutes(item)
+    if (mins > MAX_VIDEO_MINUTES) continue
+    const limit = videos === 0 ? budgetMinutes : budgetMinutes - READING_LEFT_FOR_2ND_VIDEO
+    if (used + mins > limit) continue
+    channelsUsed.add(item.sourceId)
+    perSource.set(item.sourceId, (perSource.get(item.sourceId) || 0) + 1)
+    picked.push(item)
+    used += mins
+    videos++
+  }
   for (const item of sorted) {
     if (picked.includes(item)) continue
     const n = perSource.get(item.sourceId) || 0
     if (n >= PER_SOURCE_CAP) continue
     const mins = estimateMinutes(item)
-    if (item.type === 'video' && (videos >= MAX_VIDEOS_PER_DAY || mins > 20)) continue
+    if (item.type === 'video' && (videos >= MAX_VIDEOS_PER_DAY || mins > MAX_VIDEO_MINUTES)) continue
     if (used + mins > budgetMinutes) continue
     const topic = getTopic(item)
     if (topic && (perTopic.get(topic) || 0) + mins > topicCap) continue

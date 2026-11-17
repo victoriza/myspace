@@ -111,7 +111,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             cache[src.id] = { at: now, items }
             return items
           } catch {
-            failed.push(src.name)
+            // YouTube's feeds fail now and then: keep showing the last good list and only report sources with nothing to show.
+            if (!cached?.items.length) failed.push(src.name)
             cache[src.id] = { at: now, items: cached?.items || [], error: true }
             return cached?.items || []
           }

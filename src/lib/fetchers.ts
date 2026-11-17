@@ -23,6 +23,8 @@ export async function viaRelay(url: string): Promise<string> {
 }
 
 export const youtubeFeedUrl = (channelId: string) => `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`
+/** The channel's "videos only" playlist (UC… → UULF…): no Shorts, so the ~15 items YouTube gives are all real videos. */
+export const youtubeVideosOnlyUrl = (channelId: string) => `https://www.youtube.com/feeds/videos.xml?playlist_id=UULF${channelId.slice(2)}`
 
 /** Resolves a YouTube @handle to its channel id (cached on the phone). */
 export async function resolveChannelId(source: Source): Promise<string | null> {
@@ -101,7 +103,14 @@ export async function fetchSource(source: Source, lang: Lang): Promise<FeedItem[
     case 'youtube': {
       const id = await resolveChannelId(source)
       if (!id) throw new Error('channel not found')
-      return withDurations(parseFeed(await viaRelay(youtubeFeedUrl(id)), source))
+      let items: FeedItem[] = []
+      try {
+        items = parseFeed(await viaRelay(youtubeVideosOnlyUrl(id)), source)
+      } catch {
+        /* some channels have no videos-only playlist: use the full channel feed */
+      }
+      if (!items.length) items = parseFeed(await viaRelay(youtubeFeedUrl(id)), source)
+      return withDurations(items)
     }
     default:
       return fetchRss(source)

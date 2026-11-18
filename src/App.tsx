@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { go, useRoute } from './router'
 import { About } from './screens/About'
 import { AddSource } from './screens/AddSource'
+import { Changelog } from './screens/Changelog'
 import { Article } from './screens/Article'
 import { Customize } from './screens/Customize'
 import { Done } from './screens/Done'
@@ -82,6 +83,8 @@ export default function App() {
       return <AddSource />
     case 'more':
       return <More />
+    case 'changelog':
+      return <Changelog />
     default:
       return settings.onboarded ? <Feed /> : <Why />
   }

@@ -17,11 +17,13 @@
 ## Code map
 - `src/lib/feed.ts` — daily pipeline: filter → pick (time budget, reserve ≥2 pictures and 1–2 videos, per-source/topic caps) → order; also the "Hidden today" list.
 - `src/lib/filters.ts` — calm filter (clickbait, hype, game guides, pseudoscience) and politics filter.
-- `src/lib/sources.ts` — suggested sources with topic and angle; Interests (Customize) switch topics and their sources (`topicsOff`; videogames start off).
+- `src/lib/sources.ts` — suggested sources with topic, angle and how often they post; 14 Interests in two groups (`INTEREST_GROUPS` in types.ts) switch topics and their sources (`topicsOff`, `interestPatch`; only Progreso, Soluciones, Planeta, Sociedad, Naturaleza, Ciencia, Espacio start on). `src/lib/sourceInfo.ts` — one line per source in ES/EN/CA (a test checks every source has one).
 - `src/lib/fetchers.ts` — fetching through the relay, feed discovery, YouTube video lengths. YouTube uses the channel's videos-only playlist (`UULF…`, no Shorts) with the channel feed as fallback; suggested channels store their channel ID where verified. A source that fails keeps showing its last good items.
 - `api/relay.ts` — same-origin only, rate-limited per IP, 3 MB cap, no private hosts.
-- `src/state.tsx` — app state and refresh; `src/screens/` — screens.
-- `src/lib/daytime.ts` + `src/components/Cosy.tsx` — time-of-day greeting, living logo, warm palette (`<html data-daypart>`), mini loader.
+- `src/state.tsx` — app state and refresh (offline: builds the day from the cache; cache keeps `okAt` for the Fuentes health line); `src/screens/` — screens (onboarding = Why → Suggested with interests first, then sources; Changelog = Novedades).
+- `src/lib/daytime.ts` + `src/components/Cosy.tsx` — time-of-day greeting, living logo, warm palette (`<html data-daypart>`), mini loader. Evening theme: `<html data-theme="night">` from the same clock as the sky's dark ground (≈20:23–6:36) or the phone's dark mode; set before first paint in index.html. All screens use the CSS variables, so new UI must too.
+- `src/components/bits.tsx` — SourceIcon (site favicon or soft letter), Picture (sun-gradient frame, fade-in), video length, `useOnline`. `src/lib/install.ts` — the one-time install card.
+- Fonts are self-hosted (@fontsource-variable: Inter, Space Grotesk, Source Serif 4); Latin files are precached for offline. Card titles and the reader use the serif.
 - `src/lib/sky.ts` + `src/components/Sky.tsx` — the home sky: four looks (dawn, day, sunset, night) blended by the hour, sun arc / moon / stars / clouds, waves on the horizon (measured under the chips in `Feed.tsx`), light text and dark page at night.
 - `seo/landing.ts` — build-time landing pages for Google and link previews (`/`, `/en/`, `/ca/` at https://myspace.victoriza.com): titles, descriptions, hreflang, canonical, Open Graph image (`public/og-image.png`), JSON-LD; `public/robots.txt`, `public/sitemap.xml`. Opening `/en/` or `/ca/` starts the app in that language.
 - `src/lib/update.ts` + `src/components/Updates.tsx` — new-version notice (service worker in "prompt" mode) and the one-time "What's new" card.

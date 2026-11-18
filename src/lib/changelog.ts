@@ -6,6 +6,26 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.9.0',
+    notes: {
+      es: [
+        'De noche, toda la app se oscurece con el cielo (y si tu móvil está en modo oscuro). Lectura más cómoda: títulos con serifa, una sola etiqueta por tarjeta y una línea de progreso al leer.',
+        '14 intereses: nuevos Naturaleza, Espacio, Mente y bienestar, Historia, Arte, Música y Lugares, con unas 20 fuentes nuevas (también en catalán).',
+        'Al empezar eliges primero tus temas. Fuentes muestra cómo va cada una, y en Acerca de verás cómo elegimos las fuentes.',
+      ],
+      en: [
+        'At night the whole app goes dark with the sky (and when your phone is in dark mode). Easier reading: serif titles, one label per card and a progress line while you read.',
+        '14 interests: new Nature, Space, Mind & wellbeing, History, Art, Music and Places, with about 20 new sources (Catalan ones too).',
+        'You pick your topics first when you start. Sources shows how each one is doing, and About explains how we choose them.',
+      ],
+      ca: [
+        'De nit, tota l’app s’enfosqueix amb el cel (i si el mòbil és en mode fosc). Lectura més còmoda: títols amb serif, una sola etiqueta per targeta i una línia de progrés en llegir.',
+        '14 interessos: nous Natura, Espai, Ment i benestar, Història, Art, Música i Llocs, amb unes 20 fonts noves (també en català).',
+        'En començar tries primer els teus temes. Fonts mostra com va cadascuna, i a Sobre veuràs com triem les fonts.',
+      ],
+    },
+  },
+  {
     version: '0.8.1',
     notes: {
       es: ['Vuelven los vídeos: cada día tiene su hueco para 1 o 2, como las imágenes, y ya no se cuelan Shorts.'],

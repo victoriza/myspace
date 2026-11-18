@@ -50,6 +50,8 @@ export default defineConfig({
       workbox: {
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
+        // Our own fonts (Latin only) are kept for offline use, so headings never fall back to Georgia.
+        globPatterns: ['**/*.{js,css,html,svg}', '**/*-latin-wght-normal-*.woff2'],
       },
     }),
   ],

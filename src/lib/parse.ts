@@ -1,4 +1,4 @@
-import type { FeedItem, Source } from './types'
+import type { FeedItem, Lang, Source } from './types'
 
 /** Parses RSS 2.0 / RSS 1.0 / Atom (incl. YouTube channel feeds) into feed items. */
 export function parseFeed(xml: string, source: Source): FeedItem[] {
@@ -155,4 +155,14 @@ export function findDurationSeconds(html: string): number | null {
   const iso = html.match(/itemprop="duration"\s+content="PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?"/)
   if (iso && (iso[1] || iso[2] || iso[3])) return Number(iso[1] || 0) * 3600 + Number(iso[2] || 0) * 60 + Number(iso[3] || 0)
   return null
+}
+
+/** Language a feed (or page) says it's written in, if it's one of ours. */
+export function findLanguage(text: string): Lang | null {
+  const m =
+    text.match(/<language>\s*(?:<!\[CDATA\[)?\s*([a-zA-Z]{2})/) ||
+    text.match(/<feed[^>]*\sxml:lang=["']([a-zA-Z]{2})/) ||
+    text.match(/<html[^>]*\slang=["']([a-zA-Z]{2})/)
+  const code = m?.[1].toLowerCase()
+  return code === 'es' || code === 'en' || code === 'ca' ? code : null
 }

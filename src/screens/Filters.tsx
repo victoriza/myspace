@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Header, Segmented, Switch } from '../components/ui'
+import { Header, Icon, Segmented, Switch } from '../components/ui'
 import type { Strictness } from '../lib/types'
 import { useApp } from '../state'
 
@@ -52,8 +52,8 @@ export function Filters() {
           <h2 className="card-title">{t('filters.alwaysHide')}</h2>
           <div className="word-chips">
             {settings.blockWords.map((w) => (
-              <button key={w} className="word-chip" aria-label={`${w} ×`} onClick={() => change({ blockWords: settings.blockWords.filter((x) => x !== w) })}>
-                {w} <span aria-hidden="true">×</span>
+              <button key={w} className="word-chip" aria-label={t('filters.removeWord', { word: w })} onClick={() => change({ blockWords: settings.blockWords.filter((x) => x !== w) })}>
+                {w} <span className="x" aria-hidden="true">{Icon.close}</span>
               </button>
             ))}
           </div>

@@ -33,7 +33,15 @@ export function About() {
           <a className="btn-outline" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">{t('why.sayHi')} {Icon.external}</a>
         </div>
 
+        <h2 className="section-label" id="rules-title">{t('rules.title')}</h2>
+        <section className="card pad-card" aria-labelledby="rules-title">
+          <ol className="rules">
+            {(t('rules.list', { returnObjects: true }) as string[]).map((r) => <li key={r}>{r}</li>)}
+          </ol>
+        </section>
+
         <div className="card list">
+          <button className="row link-row" onClick={() => go('changelog')}>{t('changelog.title')}{Icon.chevron}</button>
           <button className="row link-row" onClick={() => go('why')}>{t('more.about')}{Icon.chevron}</button>
         </div>
         <p className="muted small pad-x">{t('more.dataHint')}</p>

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { BottomNav, Icon, LangSwitch, Segmented, Switch } from '../components/ui'
-import { allSourcesOfTopic, sourcesForTopic, topicsOfInterest } from '../lib/sources'
-import { CONTENT_TYPES, INTERESTS, type Topic } from '../lib/types'
+import { BottomNav, Icon, Segmented, Switch } from '../components/ui'
+import { interestPatch, readableIn, SUGGESTED_SOURCES } from '../lib/sources'
+import { CONTENT_TYPES, INTEREST_GROUPS, type Lang, type Topic } from '../lib/types'
 import { go } from '../router'
 import { useApp } from '../state'
 
@@ -15,24 +15,14 @@ export function Customize() {
   }
   const topicsOff = settings.topicsOff ?? []
   // Switching an interest on/off switches its suggested sources together.
-  const toggleInterest = (interest: Topic) => {
-    const topics = topicsOfInterest(interest)
-    if (topicsOff.includes(interest)) {
-      const add = topics.flatMap((tp) => sourcesForTopic(tp, settings.lang))
-      change({ topicsOff: topicsOff.filter((x) => x !== interest), enabledSources: [...new Set([...settings.enabledSources, ...add])] })
-    } else {
-      const remove = new Set(topics.flatMap(allSourcesOfTopic))
-      change({ topicsOff: [...topicsOff, interest], enabledSources: settings.enabledSources.filter((id) => !remove.has(id)) })
-    }
-  }
+  const toggleInterest = (interest: Topic) => change(interestPatch(settings, interest))
+  // How many suggested sources (that you can read) each interest brings.
+  const available = (topic: Topic) => SUGGESTED_SOURCES.filter((s) => s.topic === topic && readableIn(s.lang, settings.lang)).length
 
   return (
     <div className="screen with-nav">
       <header className="top-header">
-        <div className="row-between">
-          <h1>{t('customize.title')}</h1>
-          <LangSwitch value={settings.lang} onChange={(lang) => updateSettings({ lang })} />
-        </div>
+        <h1>{t('customize.title')}</h1>
         <p className="muted small">{t('customize.subtitle')}</p>
       </header>
 
@@ -54,18 +44,35 @@ export function Customize() {
 
         <h2 className="section-label">{t('interests.title')}</h2>
         <div className="card pad-card stack-tight">
-          <div className="interest-chips" role="group" aria-label={t('interests.title')}>
-            {INTERESTS.map((topic) => {
-              const on = !topicsOff.includes(topic)
-              return (
-                <button key={topic} className={`chip interest ${on ? 'on' : ''}`} aria-pressed={on} onClick={() => toggleInterest(topic)}>
-                  {on ? Icon.check : null}
-                  {t(`interests.${topic}`)}
-                </button>
-              )
-            })}
-          </div>
+          {INTEREST_GROUPS.map((group) => (
+            <div key={group.id} className="interest-group" role="group" aria-labelledby={`ig-${group.id}`}>
+              <h3 id={`ig-${group.id}`} className="group-label">{t(`interests.groups.${group.id}`)}</h3>
+              <div className="interest-chips">
+                {group.interests.map((topic) => {
+                  const on = !topicsOff.includes(topic)
+                  const n = available(topic)
+                  return (
+                    <button key={topic} className={`chip interest ${on ? 'on' : ''}`} aria-pressed={on} onClick={() => toggleInterest(topic)}>
+                      {on ? Icon.check : null}
+                      {t(`interests.${topic}`)}
+                      {n ? <span className="chip-count" aria-label={`, ${t('interests.count', { count: n })}`}>{n}</span> : null}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
           <p className="muted small">{t('interests.help')}</p>
+        </div>
+
+        <h2 className="section-label">{t('customize.language')}</h2>
+        <div className="card pad-card">
+          <Segmented<Lang>
+            label={t('customize.language')}
+            value={settings.lang}
+            onChange={(lang) => updateSettings({ lang })}
+            options={(['es', 'ca', 'en'] as const).map((l) => ({ value: l, label: t(`langs.${l}`), lang: l }))}
+          />
         </div>
 
         <h2 className="section-label">{t('customize.howMuch')}</h2>

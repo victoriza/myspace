@@ -102,18 +102,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const cache = loadCache()
       const enabled = allSources(s.customSources).filter((src) => s.enabledSources.includes(src.id))
       const failed: string[] = []
+      // Offline: build the day from what's saved instead of reporting every source as failed.
+      const offline = typeof navigator !== 'undefined' && navigator.onLine === false
       const results = await Promise.all(
         enabled.map(async (src) => {
           const cached = cache[src.id]
-          if (cached && !cached.error && now - cached.at < CACHE_FRESH_MS) return cached.items
+          if (cached && (offline || (!cached.error && now - cached.at < CACHE_FRESH_MS))) return cached.items
+          if (offline) return []
           try {
             const items = await fetchSource(src, s.lang)
-            cache[src.id] = { at: now, items }
+            cache[src.id] = { at: now, items, okAt: now }
             return items
           } catch {
             // YouTube's feeds fail now and then: keep showing the last good list and only report sources with nothing to show.
             if (!cached?.items.length) failed.push(src.name)
-            cache[src.id] = { at: now, items: cached?.items || [], error: true }
+            cache[src.id] = { at: now, items: cached?.items || [], error: true, okAt: cached?.okAt ?? (cached && !cached.error ? cached.at : undefined) }
             return cached?.items || []
           }
         }),

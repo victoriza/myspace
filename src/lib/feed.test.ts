@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { buildDailyFeed, estimateMinutes, nextItem, orderMixed, pickDaily, totalMinutes } from './feed'
 import { compareVersions, notesSince } from './changelog'
-import { findDurationSeconds, parseFeed } from './parse'
-import { defaultEnabledSources, sourcesForTopic } from './sources'
-import { defaultSettings } from './storage'
-import type { FeedItem, Source, Topic } from './types'
+import { findDurationSeconds, findLanguage, parseFeed } from './parse'
+import { defaultEnabledSources, interestPatch, sourcesForTopic, SUGGESTED_SOURCES } from './sources'
+import { SOURCE_INFO } from './sourceInfo'
+import { defaultSettings, loadSettings } from './storage'
+import { INTERESTS, type FeedItem, type Source, type Topic } from './types'
 
 const now = Date.UTC(2026, 10, 16, 10)
 const H = 60 * 60 * 1000
@@ -79,21 +80,66 @@ describe('feed pipeline', () => {
   it('shows what is new only for versions newer than the last one seen', () => {
     expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
     expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
-    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.8.1', '0.8.0'])
-    expect(notesSince('0.8.1')).toEqual([])
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.9.0', '0.8.1'])
+    expect(notesSince('0.9.0')).toEqual([])
   })
 
   it('leaves out switched-off interests (videogames start off)', () => {
     const s = defaultSettings()
-    expect(s.topicsOff).toEqual(['games'])
+    expect(s.topicsOff).toContain('games')
     const items = [item(1, { sourceId: 'game-developer', title: 'How a tiny team built a cosy farming game' }), item(2, { sourceId: 'owid' })]
     expect(buildDailyFeed(items, s, {}, now).items.map((i) => i.id)).toEqual(['i2'])
     const on = { ...s, topicsOff: [] }
     expect(buildDailyFeed(items, on, {}, now).items.map((i) => i.id).sort()).toEqual(['i1', 'i2'])
   })
 
-  it('switching videogames on brings its sources', () => {
+  it('switching videogames on brings its sources (in languages you read)', () => {
     expect(sourcesForTopic('games', 'es')).toEqual(['game-developer', 'devuego', 'anaitgames', 'yt-gmtk', 'yt-noclip', 'yt-dayoscript'])
+    expect(sourcesForTopic('games', 'en')).toEqual(['game-developer', 'yt-gmtk', 'yt-noclip'])
+  })
+
+  it('every suggested source has a one-line description in ES, EN and CA, and a unique id', () => {
+    const ids = SUGGESTED_SOURCES.map((s) => s.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const s of SUGGESTED_SOURCES) {
+      for (const l of ['es', 'en', 'ca'] as const) expect(SOURCE_INFO[s.id]?.[l], `${s.id} ${l}`).toBeTruthy()
+    }
+  })
+
+  it('every interest has suggested sources, and new people start with seven interests on', () => {
+    for (const topic of INTERESTS) expect(SUGGESTED_SOURCES.some((s) => s.topic === topic), topic).toBe(true)
+    expect(INTERESTS.filter((x) => !defaultSettings().topicsOff.includes(x))).toEqual(['progress', 'solutions', 'planet', 'society', 'nature', 'science', 'space'])
+  })
+
+  it('existing people keep their interests; new ones that start off are switched off once', () => {
+    localStorage.setItem('sf.settings.v1', JSON.stringify({ onboarded: true, enabledSources: ['owid'], topicsOff: ['games'] }))
+    const s = loadSettings()
+    expect(s.topicsOff).toEqual(expect.arrayContaining(['games', 'mind', 'history', 'art', 'music', 'places']))
+    expect(s.topicsOff).not.toContain('space')
+    expect(s.topicsOff).not.toContain('nature')
+    expect(s.topicsOff).not.toContain('culture')
+    // Culture and tech were on before: only the new ones change.
+    localStorage.setItem('sf.settings.v1', JSON.stringify({ onboarded: true, enabledSources: ['owid'], topicsOff: ['science'] }))
+    const t = loadSettings()
+    expect(t.topicsOff).toEqual(expect.arrayContaining(['science', 'nature', 'space']))
+    expect(t.topicsOff).not.toContain('culture')
+    localStorage.clear()
+  })
+
+  it('switching an interest on and off brings and removes its sources', () => {
+    const s = { ...defaultSettings(), lang: 'es' as const }
+    const on = { ...s, ...interestPatch(s, 'mind') }
+    expect(on.topicsOff).not.toContain('mind')
+    expect(on.enabledSources).toEqual(expect.arrayContaining(['greater-good', 'psyche']))
+    const off = { ...on, ...interestPatch(on, 'mind') }
+    expect(off.topicsOff).toContain('mind')
+    expect(off.enabledSources).not.toContain('psyche')
+  })
+
+  it('reads the language a feed declares', () => {
+    expect(findLanguage('<rss><channel><language>ca-ES</language>')).toBe('ca')
+    expect(findLanguage('<feed xmlns="x" xml:lang="en-US">')).toBe('en')
+    expect(findLanguage('<rss><channel><language>fr</language>')).toBeNull()
   })
 
   it('reserves videos like pictures, even when newer news would fill the day', () => {

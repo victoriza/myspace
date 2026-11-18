@@ -4,7 +4,9 @@ import { useApp } from '../state'
 
 export function Done() {
   const { t } = useTranslation()
-  const { settings } = useApp()
+  const { settings, today } = useApp()
+  // A few small pictures of what you saw today, on the "look back" button.
+  const thumbs = (today?.items ?? []).filter((i) => i.image).slice(0, 3)
   return (
     <main className="done">
       <div className="done-sky-warm" aria-hidden="true" />
@@ -31,7 +33,14 @@ export function Done() {
           <div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E9B949" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" /></svg>{t('done.call')}</div>
         </div>
         <div className="opens">{t('done.opens', { hour: settings.openHour })}</div>
-        <button className="btn-link light" onClick={() => go()}>{t('done.lookBack')}</button>
+        <button className="btn-link light look-back" onClick={() => go()}>
+          {thumbs.length ? (
+            <span className="look-thumbs" aria-hidden="true">
+              {thumbs.map((i) => <span key={i.id} style={{ backgroundImage: `url("${i.image}")` }} />)}
+            </span>
+          ) : null}
+          {t('done.lookBack')}
+        </button>
       </div>
     </main>
   )

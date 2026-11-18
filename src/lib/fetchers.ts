@@ -1,4 +1,4 @@
-import { findChannelId, findDurationSeconds, findFeedLink, findTitle, parseFeed } from './parse'
+import { findChannelId, findDurationSeconds, findFeedLink, findLanguage, findTitle, parseFeed } from './parse'
 import { loadChannelIds, loadDurations, saveChannelIds, saveDurations } from './storage'
 import type { FeedItem, Lang, Source } from './types'
 
@@ -146,7 +146,7 @@ async function withDurations(items: FeedItem[]): Promise<FeedItem[]> {
   return items.map((i) => {
     const secs = i.videoId ? cache[i.videoId] : undefined
     if (!secs) return i
-    return { ...i, minutes: Math.max(1, Math.round(secs / 60)), isShort: i.isShort || secs <= 60 }
+    return { ...i, seconds: secs, minutes: Math.max(1, Math.round(secs / 60)), isShort: i.isShort || secs <= 60 }
   })
 }
 
@@ -176,7 +176,7 @@ export interface Discovered {
  * "Add your own": takes any link (website, Substack, YouTube channel or a feed URL)
  * and finds the feed behind it.
  */
-export async function discoverSource(input: string): Promise<Discovered | null> {
+export async function discoverSource(input: string, fallbackLang: Lang = 'es'): Promise<Discovered | null> {
   let url = input.trim()
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url
   let parsed: URL
@@ -200,17 +200,18 @@ export async function discoverSource(input: string): Promise<Discovered | null> 
     if (!channelId) return null
     const xml = await viaRelay(youtubeFeedUrl(channelId))
     const name = findTitle(xml) || findTitle(html) || 'YouTube'
-    const source: Source = { id, name, lang: 'es', type: 'video', kind: 'youtube', channelId, custom: true }
+    const source: Source = { id, name, lang: fallbackLang, type: 'video', kind: 'youtube', channelId, custom: true }
     return { source, sample: parseFeed(xml, source).slice(0, 3) }
   }
 
   // A feed URL, or a page that announces its feed
   const tryFeed = async (feedUrl: string, type: Source['type']) => {
     const xml = await viaRelay(feedUrl)
-    const probe: Source = { id, name: '', lang: 'es', type, kind: 'rss', url: feedUrl, custom: true }
+    const probe: Source = { id, name: '', lang: fallbackLang, type, kind: 'rss', url: feedUrl, custom: true }
     const items = parseFeed(xml, probe)
     if (!items.length) return null
     probe.name = findTitle(xml) || host
+    probe.lang = findLanguage(xml) || fallbackLang
     return { source: probe, sample: parseFeed(xml, probe).slice(0, 3) }
   }
 

@@ -62,10 +62,11 @@ export function filterItems(items: FeedItem[], settings: Settings, seen: Record<
   const kept: FeedItem[] = []
   const hidden: FilterOutcome['hidden'] = []
   const seenIds = new Set<string>()
+  const topicFor = sourceTopics(settings)
   for (const item of items) {
     if (seenIds.has(item.id)) continue
     seenIds.add(item.id)
-    const topic = sourceMeta(item.sourceId)?.topic
+    const topic = topicFor(item.sourceId)
     if (!settings.types[item.type]) hidden.push({ item, reason: 'type' })
     else if (topic && settings.topicsOff?.includes(interestOf(topic))) hidden.push({ item, reason: 'type' })
     else if (now - item.date > MAX_AGE[item.type]) hidden.push({ item, reason: 'old' })
@@ -174,10 +175,18 @@ export interface HiddenItem {
 }
 const MAX_HIDDEN_LISTED = 20
 
+/** Topic of any source: suggested ones, or the topic the person picked for their own. */
+export function sourceTopics(settings: Pick<Settings, 'customSources'>): (sourceId: string) => Topic | undefined {
+  const custom = new Map(settings.customSources.map((s) => [s.id, s.topic]))
+  return (id) => sourceMeta(id)?.topic ?? custom.get(id)
+}
+
 /** The whole pipeline: filter → pick → order. */
 export function buildDailyFeed(all: FeedItem[], settings: Settings, seen: Record<string, number>, now: number) {
   const { kept, hidden } = filterItems(all, settings, seen, now)
-  const picked = orderMixed(pickDaily(kept, settings.minutesPerDay))
+  const topicFor = sourceTopics(settings)
+  const getTopic = (i: FeedItem) => (i.type === 'video' || i.type === 'picture' ? undefined : topicFor(i.sourceId))
+  const picked = orderMixed(pickDaily(kept, settings.minutesPerDay, getTopic))
   const filtered: HiddenItem[] = hidden
     .filter((h) => h.kind)
     .sort((a, b) => b.item.date - a.item.date)

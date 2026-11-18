@@ -1,6 +1,6 @@
 import { defaultEnabledSources, SUGGESTED_SOURCES, V01_SOURCE_IDS } from './sources'
 import type { HiddenItem } from './feed'
-import type { FeedItem, Lang, Settings } from './types'
+import { DEFAULT_TOPICS_OFF, INTERESTS, V09_INTERESTS, type FeedItem, type Lang, type Settings, type Topic } from './types'
 
 /** Small wrapper around localStorage that never throws (private mode, quota, etc.). */
 const memory = new Map<string, string>()
@@ -62,8 +62,9 @@ export function defaultSettings(): Settings {
     blockedChannels: [],
     enabledSources: defaultEnabledSources(lang),
     customSources: [],
-    topicsOff: ['games'],
+    topicsOff: [...DEFAULT_TOPICS_OFF],
     knownSources: SUGGESTED_SOURCES.map((s) => s.id),
+    knownInterests: [...INTERESTS],
     openHour: 7,
   }
 }
@@ -81,6 +82,17 @@ export function loadSettings(): Settings {
     const added = SUGGESTED_SOURCES.filter((src) => !known.has(src.id) && defaults.has(src.id)).map((src) => src.id)
     merged.enabledSources = [...new Set([...s.enabledSources, ...added])]
     merged.knownSources = SUGGESTED_SOURCES.map((src) => src.id)
+  }
+  // v0.10: new interests. The ones that start off are switched off once; Nature and Space follow Science.
+  if (s.enabledSources && !s.knownInterests) {
+    const known = new Set<Topic>(V09_INTERESTS)
+    const off = new Set<Topic>(s.topicsOff ?? ['games'])
+    for (const interest of INTERESTS) {
+      if (known.has(interest)) continue
+      if (DEFAULT_TOPICS_OFF.includes(interest) || off.has('science')) off.add(interest)
+    }
+    merged.topicsOff = [...off]
+    merged.knownInterests = [...INTERESTS]
   }
   // v0.2: "Hide channel" became "Remove source" — hidden channels are now simply switched-off sources.
   if (merged.blockedChannels.length) {
@@ -111,7 +123,7 @@ export const saveToday = (t: TodayFeed) => write(K.today, t)
 export const clearToday = () => write(K.today, null)
 
 export interface SourceCache {
-  [sourceId: string]: { at: number; items: FeedItem[]; error?: boolean }
+  [sourceId: string]: { at: number; items: FeedItem[]; error?: boolean; /** Last time it answered fine. */ okAt?: number }
 }
 export const loadCache = () => read<SourceCache>(K.cache, {})
 export function saveCache(c: SourceCache) {

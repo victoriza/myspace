@@ -27,6 +27,8 @@ export function More() {
         </div>
 
         <div className="card list">
+          <button className="row link-row" onClick={() => go('add')}>{t('more.addSource')}{Icon.chevron}</button>
+          <button className="row link-row" onClick={() => go('changelog')}>{t('changelog.title')}{Icon.chevron}</button>
           <button className="row link-row" onClick={() => go('about')}>{t('about.title')}{Icon.chevron}</button>
           <button className="row link-row" onClick={() => go('why')}>{t('more.about')}{Icon.chevron}</button>
         </div>

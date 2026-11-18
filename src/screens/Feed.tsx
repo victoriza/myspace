@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BottomNav, Icon, Switch, TypeTag } from '../components/ui'
+import { BottomNav, Icon, TypeTag } from '../components/ui'
+import { Picture, SourceIcon, sourceSite, useOnline, videoLength } from '../components/bits'
+import { useInstallOffer } from '../lib/install'
 import { UpdateBar, WhatsNew } from '../components/Updates'
 import { Greeting, LivingLogo, MiniLoader } from '../components/Cosy'
 import { SkyBackdrop } from '../components/Sky'
@@ -14,9 +16,11 @@ import { useApp } from '../state'
 
 export function Feed() {
   const { t } = useTranslation()
-  const { today, seen, loading, failedSources, markSeen } = useApp()
+  const { today, seen, loading, markSeen } = useApp()
   const [filter, setFilter] = useState<ContentType | 'all'>('all')
-  const [hideSeen, setHideSeen] = useState(false)
+  // "Already seen" starts folded into one quiet line.
+  const [showOld, setShowOld] = useState(false)
+  const online = useOnline()
   // Grouping (new vs "seen earlier") uses what was seen when the feed opened,
   // so cards don't jump around while you scroll and they get marked as seen.
   const [seenAtOpen] = useState(() => ({ ...seen }))
@@ -59,7 +63,6 @@ export function Feed() {
     '--hero-sub': ink.heroSub,
     '--sea-ink': ink.seaInk,
     '--sea-strong': ink.seaStrong,
-    '--card-bg': L.card,
     '--stuck-bg': `linear-gradient(180deg, ${skyColorAt(L, 0, horizon + 20)}, ${skyColorAt(L, chipsH, horizon + 20)})`,
   } as CSSProperties
 
@@ -95,25 +98,28 @@ export function Feed() {
           <span className="muted small">
             <strong className="ink">{t('feed.todayTime', { count: totalMinutes(items) })}</strong> · {t('feed.newCount', { count: newCount })}
           </span>
-          <label className="inline-switch">
-            {t('feed.hideSeen')}
-            <Switch checked={hideSeen} onChange={setHideSeen} label={t('feed.hideSeen')} />
-          </label>
         </div>
       ) : null}
 
-      {loading && today ? <MiniLoader /> : null}
-      {failedSources.length ? <p className="muted small pad-x">{t('feed.refreshError')}</p> : null}
+      {!online ? <p className="quiet-line small" role="status">{t('offline')}</p> : null}
+      {loading && today && online ? <MiniLoader /> : null}
 
       <div className="stack">
         <WhatsNew />
         {fresh.map((item, i) => (
           <Card key={item.id} item={item} isSeen={!!seen[item.id]} cardRef={register(item.id, !!seen[item.id])} arriveIndex={arrive ? i : undefined} />
         ))}
-        {!hideSeen && old.length ? (
+        {old.length ? (
           <>
-            <div className="divider"><span />{t('feed.seenEarlier')}<span /></div>
-            {old.map((item) => <Card key={item.id} item={item} isSeen seenBefore />)}
+            <button className="seen-toggle" aria-expanded={showOld} aria-controls="seen-earlier" onClick={() => setShowOld((v) => !v)}>
+              <span className="seen-toggle-line" aria-hidden="true" />
+              <span>{showOld ? t('feed.seenHide') : t('feed.seenToggle', { count: old.length })}</span>
+              <span className={`seen-toggle-chev${showOld ? ' open' : ''}`} aria-hidden="true">{Icon.chevron}</span>
+              <span className="seen-toggle-line" aria-hidden="true" />
+            </button>
+            <div id="seen-earlier" className="stack-tight" hidden={!showOld}>
+              {showOld ? old.map((item) => <Card key={item.id} item={item} isSeen seenBefore />) : null}
+            </div>
           </>
         ) : null}
 
@@ -130,7 +136,8 @@ export function Feed() {
             <p>{t('feed.doneText')}</p>
             <button className="btn-sun" onClick={() => go('done')}>{t('feed.closeForToday')}</button>
           </section>
-        ) : items.length ? (
+        ) : null}
+        {allDone ? <InstallCard day={today?.day} /> : items.length ? (
           <p className="muted small center">{t('feed.left', { count: allFresh.length })}</p>
         ) : !loading ? (
           <div className="card empty">
@@ -240,6 +247,23 @@ function useSeenOnScroll(markSeen: (id: string) => void) {
   return { register, endRef }
 }
 
+/** "Put it on your home screen?" — once, at the end of the first day. */
+function InstallCard({ day }: { day?: string }) {
+  const { t } = useTranslation()
+  const offer = useInstallOffer(day)
+  if (!offer.show) return null
+  return (
+    <section className="card install-card" aria-labelledby="install-title">
+      <h2 id="install-title" className="card-title">{t('install.title')}</h2>
+      <p className="muted small">{offer.canPrompt ? t('install.text') : t('install.ios')}</p>
+      <div className="row-start">
+        {offer.canPrompt ? <button className="btn-primary small" onClick={offer.install}>{t('install.yes')}</button> : null}
+        <button className="btn-link" onClick={offer.dismiss}>{t('install.no')}</button>
+      </div>
+    </section>
+  )
+}
+
 function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedItem; isSeen: boolean; cardRef?: (el: HTMLElement | null) => void; arriveIndex?: number; seenBefore?: boolean }) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language as 'es' | 'en' | 'ca'
@@ -251,33 +275,30 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
   const seenMark = isSeen ? (
     <span className={`seen-mark${seenBefore ? '' : ' just-seen'}`}>{Icon.check}{t('feed.seen')}</span>
   ) : (
-    <span className="new-dot" aria-label="new" />
+    <span className="new-dot" role="img" aria-label={t('feed.new')} />
   )
-  const meta = (
-    <span className="meta">
-      <TypeTag type={item.type} />
-      {angle ? <span className={`angle angle-${angle}`}>{t(`angles.${angle}`)}</span> : null}
-      <span className="muted">{item.sourceName} · {timeAgo(item.date, lang)}</span>
-      {seenMark}
+  // One quiet label per card: the angle for news (good news · progress · solution), otherwise the type.
+  const tag = angle && item.type !== 'video' && item.type !== 'picture' ? <span className={`angle angle-${angle}`}>{t(`angles.${angle}`)}</span> : <TypeTag type={item.type} />
+  const top = <span className="card-top">{tag}{seenMark}</span>
+  const byline = (
+    <span className="byline">
+      <SourceIcon name={item.sourceName} host={sourceSite(item)} />
+      <span className="byline-text">{item.sourceName} · {timeAgo(item.date, lang)}</span>
     </span>
   )
 
   if (item.type === 'video') {
-    const videoMeta = (
-      <span className="meta">
-        <TypeTag type={item.type} />
-        <span className="muted">{item.sourceName}{item.minutes ? ` · ${item.minutes} min` : ''} · {timeAgo(item.date, lang)}</span>
-        {seenMark}
-      </span>
-    )
+    const length = videoLength(item)
     return (
       <button ref={cardRef} className={`card video-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
-        <span className="thumb" style={item.image ? { backgroundImage: `url("${item.image}")` } : undefined}>
+        <Picture src={item.image} className="thumb">
           <span className="play">{Icon.play}</span>
-        </span>
+          {length ? <span className="duration">{length}</span> : null}
+        </Picture>
         <span className="video-text">
-          {videoMeta}
+          {top}
           <span className="title" lang={textLang}>{item.title}</span>
+          {byline}
         </span>
       </button>
     )
@@ -286,10 +307,11 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
   if (item.type === 'picture') {
     return (
       <button ref={cardRef} className={`card picture-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
-        <span className="picture" style={item.image ? { backgroundImage: `url("${item.image}")` } : undefined} />
+        <Picture src={item.image} title={item.title} className="picture" />
         <span className="picture-text">
-          {meta}
+          {top}
           <span className="title" lang={textLang}>{item.title}</span>
+          {byline}
         </span>
       </button>
     )
@@ -297,9 +319,10 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
 
   return (
     <button ref={cardRef} className={`card text-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
-      {meta}
+      {top}
       <span className="title" lang={textLang}>{item.title}</span>
       {item.summary ? <span className="summary" lang={textLang}>{item.summary}</span> : null}
+      {byline}
     </button>
   )
 }

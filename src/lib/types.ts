@@ -6,10 +6,24 @@ export type ContentType = 'news' | 'video' | 'newsletter' | 'tech' | 'picture'
 export const CONTENT_TYPES: ContentType[] = ['news', 'video', 'newsletter', 'tech', 'picture']
 
 /** What a source mostly covers — used to keep each day balanced across subjects. */
-export type Topic = 'science' | 'planet' | 'tech' | 'progress' | 'society' | 'culture' | 'nature' | 'solutions' | 'games'
+export type Topic =
+  | 'science' | 'planet' | 'tech' | 'progress' | 'society' | 'culture' | 'nature' | 'solutions' | 'games'
+  | 'space' | 'mind' | 'history' | 'art' | 'music' | 'places'
 
-/** Subjects a person can switch on/off in Customize → Interests (nature is shown under science). */
-export const INTERESTS: Topic[] = ['science', 'planet', 'progress', 'society', 'solutions', 'culture', 'tech', 'games']
+/** Interests, in two groups (shown in onboarding and Customize). Each interest is one topic. */
+export const INTEREST_GROUPS: { id: 'world' | 'mind'; interests: Topic[] }[] = [
+  { id: 'world', interests: ['progress', 'solutions', 'planet', 'society', 'nature', 'places'] },
+  { id: 'mind', interests: ['science', 'space', 'mind', 'history', 'art', 'music', 'culture', 'tech', 'games'] },
+]
+
+/** Subjects a person can switch on/off in Customize → Interests. */
+export const INTERESTS: Topic[] = INTEREST_GROUPS.flatMap((g) => g.interests)
+
+/** Interests that start off for new people (they switch on what they like). */
+export const DEFAULT_TOPICS_OFF: Topic[] = ['places', 'mind', 'history', 'art', 'music', 'culture', 'tech', 'games']
+
+/** Interests that existed before v0.10 (used once to switch new interests off for existing people). */
+export const V09_INTERESTS: Topic[] = ['science', 'planet', 'progress', 'society', 'solutions', 'culture', 'tech', 'games']
 
 /**
  * The editorial angle of a source:
@@ -44,6 +58,8 @@ export interface Source {
   site?: string
   /** Switched on when its topic is switched on in Interests (for topics that start off, like games). */
   onWithTopic?: boolean
+  /** Roughly how often it posts. */
+  often?: 'daily' | 'few' | 'weekly'
 }
 
 export interface FeedItem {
@@ -64,6 +80,8 @@ export interface FeedItem {
   videoId?: string
   /** Length in minutes, when the source tells us (videos). */
   minutes?: number
+  /** Exact length in seconds (videos), when known. */
+  seconds?: number
   isShort?: boolean
 }
 
@@ -87,6 +105,8 @@ export interface Settings {
   topicsOff: Topic[]
   /** Suggested sources the person has already been offered — new suggestions that are on by default get switched on once. */
   knownSources: string[]
+  /** Interests the person has already been offered — new ones that start off are switched off once. */
+  knownInterests?: Topic[]
   /** Hour of the day when tomorrow's feed opens. */
   openHour: number
 }

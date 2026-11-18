@@ -68,11 +68,11 @@ export function Switch({ checked, onChange, label }: { checked: boolean; onChang
   )
 }
 
-export function Segmented<T extends string | number>({ options, value, onChange, label, dark }: { options: { value: T; label: string }[]; value: T; onChange: (v: T) => void; label: string; dark?: boolean }) {
+export function Segmented<T extends string | number>({ options, value, onChange, label, dark }: { options: { value: T; label: string; lang?: string }[]; value: T; onChange: (v: T) => void; label: string; dark?: boolean }) {
   return (
     <div role="radiogroup" aria-label={label} className={`segmented ${dark ? 'dark' : ''}`}>
       {options.map((o) => (
-        <button key={String(o.value)} role="radio" aria-checked={o.value === value} className={o.value === value ? 'on' : ''} onClick={() => onChange(o.value)}>
+        <button key={String(o.value)} lang={o.lang} role="radio" aria-checked={o.value === value} className={o.value === value ? 'on' : ''} onClick={() => onChange(o.value)}>
           {o.label}
         </button>
       ))}

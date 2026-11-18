@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Icon, TypeTag } from '../components/ui'
+import { Icon } from '../components/ui'
+import { SourceIcon, videoLength } from '../components/bits'
 import { timeAgo } from '../lib/time'
 import { NextBar } from '../components/NextBar'
 import { RemoveSource } from '../components/RemoveSource'
@@ -26,6 +27,8 @@ export function Video({ id }: { id: string }) {
     )
   }
 
+  const textLang = itemLang(item.sourceId, i18n.language as 'es')
+  const length = videoLength(item)
   // youtube.com (not -nocookie) so a signed-in Premium account is recognized.
   const src = `https://www.youtube.com/embed/${encodeURIComponent(item.videoId)}?rel=0&modestbranding=1&playsinline=1&autoplay=1`
 
@@ -43,18 +46,19 @@ export function Video({ id }: { id: string }) {
           allowFullScreen
         />
       </div>
-      <main className="stack pad">
-        <span className="meta">
-          <TypeTag type="video" />
-          <span className="muted">{item.sourceName} · {timeAgo(item.date, i18n.language as 'es')}</span>
-        </span>
-        <h1 className="video-title" lang={itemLang(item.sourceId, i18n.language as 'es')}>{item.title}</h1>
-        {item.summary ? <p className="muted clamp-3">{item.summary}</p> : null}
-
-        <div className="grid-2">
-          <button className="btn-secondary on" disabled>{Icon.check} {t('video.watched')}</button>
-          <a className="btn-secondary" href={item.link} target="_blank" rel="noopener noreferrer">{t('video.onYouTube')}</a>
+      <main className="stack pad video-main">
+        <h1 className="video-title" lang={textLang}>{item.title}</h1>
+        <div className="channel-row">
+          <SourceIcon name={item.sourceName} size={36} />
+          <span className="channel-text">
+            <strong>{item.sourceName}</strong>
+            <span className="muted small">{[t('video.channel'), length, timeAgo(item.date, i18n.language as 'es')].filter(Boolean).join(' · ')}</span>
+          </span>
+          <span className="watched-status">{Icon.check} {t('video.watched')}</span>
         </div>
+        {item.summary ? <p className="video-desc clamp-3" lang={textLang}>{item.summary}</p> : null}
+
+        <a className="btn-outline" href={item.link} target="_blank" rel="noopener noreferrer">{t('video.open')} {Icon.external}</a>
 
         <p className="muted small">{t('video.noAutoplay')}</p>
         <RemoveSource item={item} />

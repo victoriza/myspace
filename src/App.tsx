@@ -3,6 +3,7 @@ import { go, useRoute } from './router'
 import { About } from './screens/About'
 import { AddSource } from './screens/AddSource'
 import { Changelog } from './screens/Changelog'
+import { Rules } from './screens/Rules'
 import { Article } from './screens/Article'
 import { Customize } from './screens/Customize'
 import { Done } from './screens/Done'
@@ -85,6 +86,8 @@ export default function App() {
       return <More />
     case 'changelog':
       return <Changelog />
+    case 'rules':
+      return <Rules />
     default:
       return settings.onboarded ? <Feed /> : <Why />
   }

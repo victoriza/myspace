@@ -1,12 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { Header } from '../components/ui'
-import { CHANGELOG } from '../lib/changelog'
+import { useEffect } from 'react'
+import { APP_VERSION, CHANGELOG } from '../lib/changelog'
+import { saveLastVersion } from '../lib/storage'
 import type { Lang } from '../lib/types'
 
 /** Every version, newest first, in the person's language. */
 export function Changelog() {
   const { t, i18n } = useTranslation()
   const lang = i18n.language as Lang
+  // Reading the full list counts as having seen what's new (no card on the feed, no dot in Más).
+  useEffect(() => saveLastVersion(APP_VERSION), [])
   return (
     <div className="screen">
       <Header title={t('changelog.title')} />

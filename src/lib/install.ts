@@ -83,3 +83,28 @@ export function useInstallOffer(day: string | undefined) {
     },
   }
 }
+
+/** For Más → "Instalar Space Feed": hidden once installed; Android gets the real prompt, iPhone the steps. */
+export function useInstall() {
+  const [, bump] = useState(0)
+  useEffect(() => {
+    const l = () => bump((n) => n + 1)
+    listeners.add(l)
+    return () => {
+      listeners.delete(l)
+    }
+  }, [])
+  return {
+    installed: standalone(),
+    canPrompt: !!deferred,
+    ios: isIos(),
+    install: async () => {
+      if (!deferred) return
+      await deferred.prompt()
+      const choice = await deferred.userChoice
+      if (choice.outcome === 'accepted') save({ state: 'done' })
+      deferred = null
+      bump((n) => n + 1)
+    },
+  }
+}

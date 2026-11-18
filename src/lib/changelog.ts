@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.9.3',
+    notes: {
+      es: ['Más, reordenado: tu móvil, sobre Space Feed y tus datos, cada cosa en un solo sitio.', '«Añadir una fuente» ahora está en Personalizar, junto a Fuentes.'],
+      en: ['More, reorganised: your phone, about Space Feed and your data, each thing in one place.', '“Add a source” now lives in Customize, next to Sources.'],
+      ca: ['Més, reordenat: el teu mòbil, sobre Space Feed i les teves dades, cada cosa en un sol lloc.', '«Afegir una font» ara és a Personalitzar, al costat de Fonts.'],
+    },
+  },
+  {
     version: '0.9.2',
     notes: {
       es: ['Algo cuenta como visto solo cuando lo abres: pasar de largo ya no lo marca.', 'Al cerrar el día, una forma tranquila de volver al feed de hoy.'],

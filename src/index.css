@@ -617,3 +617,15 @@ h1[tabindex='-1']:focus { outline: none; }
 .prep-msg { position: absolute; left: 24px; right: 24px; top: 70%; text-align: center; font-family: 'Source Serif 4 Variable', Georgia, serif; font-size: 21px; font-weight: 600; color: #172036; animation: sf-fadein .7s ease both; }
 .preparing.night .prep-msg { color: #eceef6; }
 @media (prefers-reduced-motion: reduce) { .prep-sun, .prep-moon { transform: translate(-50%, -78%); } .prep-stars span { opacity: .8; } }
+
+/* ---------- Más (v0.9.3): grouped rows with an icon and a one-line hint ---------- */
+.more-row { gap: 12px; align-items: center; min-height: 60px; padding: 10px 0; }
+.more-row .row-text { gap: 2px; }
+.more-icon { flex: none; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: color-mix(in srgb, var(--sun) 16%, var(--surface)); color: #9a6a12; }
+.more-title { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--ink); }
+.danger-link { color: #b0412e; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
+.align-start { align-self: flex-start; padding-left: 0; }
+.more-footer { text-align: center; margin: 4px 0 0; }
+:root[data-theme='night'] .more-icon { background: rgba(241, 210, 122, 0.12); color: #f1d27a; }
+:root[data-theme='night'] .danger-link { color: #f2a090; }
+.more-row .row-text .muted { font-weight: 400; }

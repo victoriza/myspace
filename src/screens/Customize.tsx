@@ -89,7 +89,7 @@ export function Customize() {
         <div className="card list">
           <button className="row link-row" onClick={() => go('filters')}>{t('customize.filters')}{Icon.chevron}</button>
           <button className="row link-row" onClick={() => go('sources')}>{t('customize.sources')}{Icon.chevron}</button>
-          <button className="row link-row" onClick={() => go('why')}>{t('customize.why')}{Icon.chevron}</button>
+          <button className="row link-row" onClick={() => go('add')}>{t('more.addSource')}{Icon.chevron}</button>
         </div>
       </main>
       <BottomNav active="customize" />

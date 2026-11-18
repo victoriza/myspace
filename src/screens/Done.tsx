@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next'
+import { Icon } from '../components/ui'
 import { go } from '../router'
 import { useApp } from '../state'
 
 export function Done() {
   const { t } = useTranslation()
-  const { settings, today } = useApp()
-  // A few small pictures of what you saw today, on the "look back" button.
-  const thumbs = (today?.items ?? []).filter((i) => i.image).slice(0, 3)
+  const { settings } = useApp()
   return (
     <main className="done">
       <div className="done-sky-warm" aria-hidden="true" />
@@ -34,11 +33,7 @@ export function Done() {
         </div>
         <div className="opens">{t('done.opens', { hour: settings.openHour })}</div>
         <button className="btn-link light look-back" onClick={() => go()}>
-          {thumbs.length ? (
-            <span className="look-thumbs" aria-hidden="true">
-              {thumbs.map((i) => <span key={i.id} style={{ backgroundImage: `url("${i.image}")` }} />)}
-            </span>
-          ) : null}
+          {Icon.back}
           {t('done.lookBack')}
         </button>
       </div>

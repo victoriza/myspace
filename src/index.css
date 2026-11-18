@@ -537,11 +537,9 @@ h1[tabindex='-1']:focus { outline: none; }
 .changelog ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
 .changelog .latest { box-shadow: inset 3px 0 0 var(--sun), var(--shadow); }
 
-/* Done: a few pictures of today on "look back" */
-.look-back { display: inline-flex; align-items: center; gap: 10px; }
-.look-thumbs { display: inline-flex; }
-.look-thumbs span { width: 28px; height: 28px; border-radius: 8px; background: #3b4a7a center / cover no-repeat; border: 2px solid #232d4c; margin-left: -8px; }
-.look-thumbs span:first-child { margin-left: 0; }
+/* Done: a quiet way back to today's feed */
+.look-back { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(220, 225, 238, 0.35); }
+.look-back svg { width: 18px; height: 18px; }
 
 /* ---------- evening theme: every screen goes dark with the sky (and with the phone's dark mode) ---------- */
 :root[data-theme='night'] {

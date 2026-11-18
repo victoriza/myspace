@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.9.2',
+    notes: {
+      es: ['Algo cuenta como visto solo cuando lo abres: pasar de largo ya no lo marca.', 'Al cerrar el día, una forma tranquila de volver al feed de hoy.'],
+      en: ['Something counts as seen only when you open it: scrolling past no longer marks it.', 'When the day is done, a quiet way back to today’s feed.'],
+      ca: ['Una cosa compta com a vista només quan l’obres: passar de llarg ja no la marca.', 'En tancar el dia, una manera tranquil·la de tornar al feed d’avui.'],
+    },
+  },
+  {
     version: '0.9.1',
     notes: {
       es: ['Cuando cambias algo en Personalizar, tu feed se prepara con calma: sale el sol (o la luna) sobre el mar y luego llegan las tarjetas.'],

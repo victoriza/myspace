@@ -132,7 +132,7 @@ export const ca: typeof es = {
     read: 'Llegeix unes pàgines',
     call: 'Truca a algú',
     opens: 'Torna a obrir demà a les {{hour}}:00',
-    lookBack: 'Repassar el d’avui',
+    lookBack: 'Tornar al feed d’avui',
   },
   customize: {
     title: 'Personalitzar',

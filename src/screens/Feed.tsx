@@ -16,7 +16,7 @@ import { useApp } from '../state'
 
 export function Feed() {
   const { t } = useTranslation()
-  const { today, seen, loading, markSeen, feedChanged, clearFeedChanged } = useApp()
+  const { today, seen, loading, feedChanged, clearFeedChanged } = useApp()
   // Back from Personalizar with changes: a calm "preparing your feed" moment, then the cards rise in.
   const [preparing, setPreparing] = useState(() => feedChanged())
   const [revealed, setRevealed] = useState(false)
@@ -52,7 +52,6 @@ export function Feed() {
   const allFresh = items.filter((i) => !seen[i.id])
   const allDone = items.length > 0 && allFresh.length === 0
 
-  const { register, endRef } = useSeenOnScroll(markSeen)
   const { heroRef, chipsRef, sentinelRef, horizon, stuck, chipsH } = useHorizon(`${presentTypes.length > 1}-${items.length > 0}`)
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
@@ -113,7 +112,7 @@ export function Feed() {
       <div className="stack" key={preparing ? 'waiting' : 'shown'}>
         <WhatsNew />
         {fresh.map((item, i) => (
-          <Card key={item.id} item={item} isSeen={!!seen[item.id]} cardRef={register(item.id, !!seen[item.id])} arriveIndex={arrive ? i : undefined} />
+          <Card key={item.id} item={item} isSeen={!!seen[item.id]} arriveIndex={arrive ? i : undefined} />
         ))}
         {old.length ? (
           <>
@@ -128,8 +127,6 @@ export function Feed() {
             </div>
           </>
         ) : null}
-
-        <div ref={endRef} aria-hidden="true" className="end-sentinel" />
 
         {allDone ? (
           <section className="done-card">
@@ -199,60 +196,6 @@ function useHorizon(layoutKey: string) {
   return { heroRef, chipsRef, sentinelRef, horizon, stuck, chipsH }
 }
 
-/**
- * Marks items as seen while scrolling:
- * - a card that was on screen and then scrolled up past the top counts as seen;
- * - reaching the end of the list marks every card you've had on screen as seen.
- */
-function useSeenOnScroll(markSeen: (id: string) => void) {
-  const shown = useRef(new Set<string>())
-  const nodes = useRef(new Map<Element, string>())
-  const observer = useRef<IntersectionObserver | null>(null)
-  const endObserver = useRef<IntersectionObserver | null>(null)
-
-  useEffect(() => {
-    if (typeof IntersectionObserver === 'undefined') return
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          const id = nodes.current.get(e.target)
-          if (!id) continue
-          if (e.isIntersecting && e.intersectionRatio >= 0.6) shown.current.add(id)
-          else if (!e.isIntersecting && shown.current.has(id) && e.boundingClientRect.bottom <= (e.rootBounds?.top ?? 0) + 1) markSeen(id)
-        }
-      },
-      { threshold: [0, 0.6] },
-    )
-    nodes.current.forEach((_, el) => observer.current!.observe(el))
-    return () => observer.current?.disconnect()
-  }, [markSeen])
-
-  const register = (id: string, already: boolean) => (el: HTMLElement | null) => {
-    if (!el || already) return
-    if (!nodes.current.has(el)) {
-      nodes.current.set(el, id)
-      observer.current?.observe(el)
-    }
-  }
-
-  const endRef = (el: HTMLDivElement | null) => {
-    endObserver.current?.disconnect()
-    if (!el || typeof IntersectionObserver === 'undefined') return
-    endObserver.current = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        // You reached the end: everything you've had on screen counts as seen.
-        nodes.current.forEach((id, node) => {
-          const r = node.getBoundingClientRect()
-          if (shown.current.has(id) || r.bottom <= window.innerHeight) markSeen(id)
-        })
-      }
-    })
-    endObserver.current.observe(el)
-  }
-
-  return { register, endRef }
-}
-
 /** "Put it on your home screen?" — once, at the end of the first day. */
 function InstallCard({ day }: { day?: string }) {
   const { t } = useTranslation()
@@ -270,7 +213,8 @@ function InstallCard({ day }: { day?: string }) {
   )
 }
 
-function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedItem; isSeen: boolean; cardRef?: (el: HTMLElement | null) => void; arriveIndex?: number; seenBefore?: boolean }) {
+/** A card in the feed. Only opening it marks it as seen (scrolling past doesn't). */
+function Card({ item, isSeen, arriveIndex, seenBefore }: { item: FeedItem; isSeen: boolean; arriveIndex?: number; seenBefore?: boolean }) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language as 'es' | 'en' | 'ca'
   const open = () => go(item.type === 'video' && item.videoId ? 'video' : 'article', item.id)
@@ -296,7 +240,7 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
   if (item.type === 'video') {
     const length = videoLength(item)
     return (
-      <button ref={cardRef} className={`card video-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
+      <button className={`card video-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
         <Picture src={item.image} className="thumb">
           <span className="play">{Icon.play}</span>
           {length ? <span className="duration">{length}</span> : null}
@@ -312,7 +256,7 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
 
   if (item.type === 'picture') {
     return (
-      <button ref={cardRef} className={`card picture-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
+      <button className={`card picture-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
         <Picture src={item.image} title={item.title} className="picture" />
         <span className="picture-text">
           {top}
@@ -324,7 +268,7 @@ function Card({ item, isSeen, cardRef, arriveIndex, seenBefore }: { item: FeedIt
   }
 
   return (
-    <button ref={cardRef} className={`card text-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
+    <button className={`card text-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
       {top}
       <span className="title" lang={textLang}>{item.title}</span>
       {item.summary ? <span className="summary" lang={textLang}>{item.summary}</span> : null}

@@ -132,7 +132,7 @@ export const en: typeof es = {
     read: 'Read a few pages',
     call: 'Call a friend',
     opens: 'Opens again tomorrow at {{hour}}:00',
-    lookBack: 'Look back at today’s items',
+    lookBack: 'Back to today’s feed',
   },
   customize: {
     title: 'Customize',

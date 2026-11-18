@@ -130,7 +130,7 @@ export const es = {
     read: 'Lee unas páginas',
     call: 'Llama a alguien',
     opens: 'Vuelve a abrir mañana a las {{hour}}:00',
-    lookBack: 'Repasar lo de hoy',
+    lookBack: 'Volver al feed de hoy',
   },
   customize: {
     title: 'Personalizar',

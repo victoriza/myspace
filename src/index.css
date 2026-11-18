@@ -629,3 +629,13 @@ h1[tabindex='-1']:focus { outline: none; }
 :root[data-theme='night'] .more-icon { background: rgba(241, 210, 122, 0.12); color: #f1d27a; }
 :root[data-theme='night'] .danger-link { color: #f2a090; }
 .more-row .row-text .muted { font-weight: 400; }
+
+/* ---------- v0.10: share, finish for today ---------- */
+.btn-quiet { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: transparent; color: var(--ink-2); font: inherit; font-size: 15px; font-weight: 600; }
+.btn-quiet:active { background: var(--line); }
+.share-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.share-note:empty { display: none; }
+.feed-end { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-bottom: 8px; }
+.finish-link { min-height: 44px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--line-2); color: var(--ink-2); }
+.sky-home.sky-dark .finish-link { color: #c9d1ea; text-decoration-color: rgba(255,255,255,.3); }
+a.more-row { color: inherit; text-decoration: none; }

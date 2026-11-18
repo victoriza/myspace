@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.10.0',
+    notes: {
+      es: ['Comparte lo que lees con un toque, o comparte Space Feed desde Más.', '«Terminar por hoy» al final del feed, para cerrar el día sin abrirlo todo.', 'En «Quién lo hace» puedes sugerir una fuente o avisar de un fallo.'],
+      en: ['Share what you read in one tap, or share Space Feed from More.', '“Finish for today” at the end of the feed, to close the day without opening everything.', 'In “Who makes it” you can suggest a source or report a bug.'],
+      ca: ['Comparteix el que llegeixes amb un toc, o comparteix Space Feed des de Més.', '«Acabar per avui» al final del feed, per tancar el dia sense obrir-ho tot.', 'A «Qui el fa» pots suggerir una font o avisar d’un error.'],
+    },
+  },
+  {
     version: '0.9.3',
     notes: {
       es: ['Más, reordenado: tu móvil, sobre Space Feed y tus datos, cada cosa en un solo sitio.', '«Añadir una fuente» ahora está en Personalizar, junto a Fuentes.'],

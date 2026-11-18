@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '../components/ui'
-import { SourceIcon, videoLength } from '../components/bits'
+import { ShareButton, SourceIcon, videoLength } from '../components/bits'
 import { timeAgo } from '../lib/time'
 import { NextBar } from '../components/NextBar'
 import { RemoveSource } from '../components/RemoveSource'
@@ -59,6 +59,7 @@ export function Video({ id }: { id: string }) {
         {item.summary ? <p className="video-desc clamp-3" lang={textLang}>{item.summary}</p> : null}
 
         <a className="btn-outline" href={item.link} target="_blank" rel="noopener noreferrer">{t('video.open')} {Icon.external}</a>
+        <ShareButton title={item.title} text={`${item.title} · ${t('share.via')}`} url={item.link} />
 
         <p className="muted small">{t('video.noAutoplay')}</p>
         <RemoveSource item={item} />

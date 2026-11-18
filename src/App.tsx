@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { go, useRoute } from './router'
+import { loadClosedDay } from './lib/storage'
 import { About } from './screens/About'
 import { AddSource } from './screens/AddSource'
 import { Changelog } from './screens/Changelog'
@@ -42,7 +43,7 @@ export default function App() {
   // If everything is already seen today, open on the "closed until tomorrow" screen.
   useEffect(() => {
     if (splash || !today || route.length) return
-    if (today.items.length && today.items.every((i) => seen[i.id])) go('done')
+    if (loadClosedDay() === today.day || (today.items.length && today.items.every((i) => seen[i.id]))) go('done')
     // only right after the splash
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [splash])

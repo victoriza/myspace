@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { BottomNav, Icon, TypeTag } from '../components/ui'
 import { Picture, SourceIcon, sourceSite, useOnline, videoLength } from '../components/bits'
 import { useInstallOffer } from '../lib/install'
+import { saveClosedDay } from '../lib/storage'
 import { UpdateBar, WhatsNew } from '../components/Updates'
 import { Greeting, LivingLogo, MiniLoader, Preparing } from '../components/Cosy'
 import { SkyBackdrop } from '../components/Sky'
@@ -141,7 +142,10 @@ export function Feed() {
           </section>
         ) : null}
         {allDone ? <InstallCard day={today?.day} /> : items.length ? (
-          <p className="muted small center">{t('feed.left', { count: allFresh.length })}</p>
+          <div className="feed-end">
+            <p className="muted small center">{t('feed.left', { count: allFresh.length })}</p>
+            <button className="btn-link finish-link" onClick={() => { if (today) saveClosedDay(today.day); go('done') }}>{t('feed.finishToday')}</button>
+          </div>
         ) : !loading ? (
           <div className="card empty">
             <p>{t('feed.empty')}</p>

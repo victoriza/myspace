@@ -2,7 +2,7 @@ import DOMPurify from 'dompurify'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { hostOf, Icon, TypeTag } from '../components/ui'
-import { SourceIcon, sourceSite } from '../components/bits'
+import { ShareButton, SourceIcon, sourceSite } from '../components/bits'
 import { firstSentence } from '../lib/parse'
 import { readingMinutes, timeAgo } from '../lib/time'
 import { NextBar } from '../components/NextBar'
@@ -93,6 +93,7 @@ export function Article({ id }: { id: string }) {
         <a className="btn-outline wide" href={item.link} target="_blank" rel="noopener noreferrer">
           {t('article.readOn', { site })} {Icon.external}
         </a>
+        <ShareButton title={item.title} text={`${item.title} · ${t('share.via')}`} url={item.link} />
 
         <RemoveSource item={item} />
       </main>

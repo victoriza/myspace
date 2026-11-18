@@ -31,6 +31,7 @@ const K = {
   channels: 'sf.channels.v1',
   durations: 'sf.durations.v1',
   lastVersion: 'sf.version.v1',
+  closedDay: 'sf.closed.v1',
 }
 
 export function detectLang(): Lang {
@@ -153,6 +154,9 @@ export function saveDurations(d: Record<string, number>) {
 
 /** Version whose "What's new" the person has already seen. */
 export const loadLastVersion = () => read<string | null>(K.lastVersion, null)
+/** The day the person tapped "Terminar por hoy" (the app opens on the Done screen for the rest of that day). */
+export const loadClosedDay = () => read<string | null>(K.closedDay, null)
+export const saveClosedDay = (day: string) => write(K.closedDay, day)
 export const saveLastVersion = (v: string) => write(K.lastVersion, v)
 
 /** First run ever (nothing saved yet): there's nothing "new" to show, so start at the current version. */

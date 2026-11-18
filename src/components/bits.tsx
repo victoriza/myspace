@@ -1,4 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react'
+import { useTranslation } from 'react-i18next'
+import { shareLink } from '../lib/share'
 import { sourceMeta } from '../lib/sources'
 import type { FeedItem } from '../lib/types'
 import { hostOf } from './ui'
@@ -98,4 +100,29 @@ export function useOnline(): boolean {
     }
   }, [])
   return online
+}
+
+const shareIcon = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 3v12M7.5 7.5 12 3l4.5 4.5" />
+    <path d="M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12" />
+  </svg>
+)
+
+/** A quiet "Compartir" button: the phone's share sheet, or "Link copied" where there isn't one. */
+export function ShareButton({ title, text, url, label, className = 'btn-quiet' }: { title: string; text?: string; url: string; label?: string; className?: string }) {
+  const { t } = useTranslation()
+  const [note, setNote] = useState('')
+  const share = async () => {
+    const r = await shareLink({ title, text, url })
+    if (r === 'shared') return
+    setNote(r === 'copied' ? t('share.copied') : t('share.failed'))
+    setTimeout(() => setNote(''), 3000)
+  }
+  return (
+    <span className="share-wrap">
+      <button className={className} onClick={share}>{shareIcon}{label ?? t('share.button')}</button>
+      <span className="share-note small muted" role="status">{note}</span>
+    </span>
+  )
 }

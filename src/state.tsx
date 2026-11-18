@@ -20,6 +20,8 @@ import {
 import type { FeedItem, Settings, Source } from './lib/types'
 
 const CACHE_FRESH_MS = 30 * 60 * 1000
+/** Settings that change what's in the feed. */
+const FEED_KEYS: (keyof Settings)[] = ['types', 'topicsOff', 'enabledSources', 'customSources', 'minutesPerDay', 'strictness', 'hidePolitics', 'skipShorts', 'blockWords']
 
 interface AppState {
   settings: Settings
@@ -28,7 +30,11 @@ interface AppState {
   loading: boolean
   failedSources: string[]
   sources: Source[]
-  updateSettings: (patch: Partial<Settings>) => void
+  /** `silent`: not a choice made in Personalizar (e.g. removing a source from an article), so no "preparing" scene. */
+  updateSettings: (patch: Partial<Settings>, opts?: { silent?: boolean }) => void
+  /** Something that shapes the feed changed since the feed was last on screen (→ the calm "preparing your feed" scene). */
+  feedChanged: () => boolean
+  clearFeedChanged: () => void
   markSeen: (id: string) => void
   refresh: (opts?: { force?: boolean }) => Promise<void>
   itemById: (id: string) => FeedItem | undefined
@@ -72,7 +78,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = settings.lang
   }, [settings.lang])
 
-  const updateSettings = useCallback((patch: Partial<Settings>) => {
+  const changedRef = useRef(false)
+  const feedChanged = useCallback(() => changedRef.current, [])
+  const clearFeedChanged = useCallback(() => {
+    changedRef.current = false
+  }, [])
+
+  const updateSettings = useCallback((patch: Partial<Settings>, opts: { silent?: boolean } = {}) => {
+    const prev = settingsRef.current
+    if (prev.onboarded && !opts.silent && FEED_KEYS.some((k) => k in patch && JSON.stringify(patch[k]) !== JSON.stringify(prev[k]))) changedRef.current = true
     const next = { ...settingsRef.current, ...patch }
     settingsRef.current = next
     saveSettings(next)
@@ -146,14 +160,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const removeSource = useCallback((sourceId: string, keepItemId?: string) => {
     const prevEnabled = settingsRef.current.enabledSources
     const prevToday = loadToday()
-    updateSettings({ enabledSources: prevEnabled.filter((id) => id !== sourceId) })
+    updateSettings({ enabledSources: prevEnabled.filter((id) => id !== sourceId) }, { silent: true })
     if (prevToday) {
       const next = { ...prevToday, items: prevToday.items.filter((i) => i.sourceId !== sourceId || i.id === keepItemId) }
       saveToday(next)
       setToday(next)
     }
     return () => {
-      updateSettings({ enabledSources: [...new Set([...settingsRef.current.enabledSources, sourceId])] })
+      updateSettings({ enabledSources: [...new Set([...settingsRef.current.enabledSources, sourceId])] }, { silent: true })
       if (prevToday) {
         saveToday(prevToday)
         setToday(prevToday)
@@ -173,6 +187,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const resetAll = useCallback(() => {
     clearAll()
     clearToday()
+    changedRef.current = false
     const d = defaultSettings()
     settingsRef.current = d
     seenRef.current = {}
@@ -182,8 +197,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo<AppState>(
-    () => ({ settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, removeSource, showFiltered, resetAll }),
-    [settings, seen, today, loading, failedSources, sources, updateSettings, markSeen, refresh, itemById, removeSource, showFiltered, resetAll],
+    () => ({ settings, seen, today, loading, failedSources, sources, updateSettings, feedChanged, clearFeedChanged, markSeen, refresh, itemById, removeSource, showFiltered, resetAll }),
+    [settings, seen, today, loading, failedSources, sources, updateSettings, feedChanged, clearFeedChanged, markSeen, refresh, itemById, removeSource, showFiltered, resetAll],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

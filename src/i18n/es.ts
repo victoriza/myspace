@@ -263,4 +263,5 @@ export const es = {
     ],
   },
   changelog: { title: 'Novedades', version: 'Versión {{version}}' },
+  prepare: { messages: ['Preparando tu feed…', 'Eligiendo lo bueno de hoy…', 'Listo. Sin prisa.'] },
 }

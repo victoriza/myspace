@@ -265,4 +265,5 @@ export const ca: typeof es = {
     ],
   },
   changelog: { title: 'Novetats', version: 'Versió {{version}}' },
+  prepare: { messages: ['Preparant el teu feed…', 'Triant el que és bo d’avui…', 'Llest. Sense pressa.'] },
 }

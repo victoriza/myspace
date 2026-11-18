@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.9.1',
+    notes: {
+      es: ['Cuando cambias algo en Personalizar, tu feed se prepara con calma: sale el sol (o la luna) sobre el mar y luego llegan las tarjetas.'],
+      en: ['When you change something in Customize, your feed is prepared calmly: the sun (or the moon) rises over the sea, then the cards arrive.'],
+      ca: ['Quan canvies alguna cosa a Personalitzar, el feed es prepara amb calma: surt el sol (o la lluna) sobre el mar i després arriben les targetes.'],
+    },
+  },
+  {
     version: '0.9.0',
     notes: {
       es: [

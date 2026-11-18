@@ -265,4 +265,5 @@ export const en: typeof es = {
     ],
   },
   changelog: { title: 'What’s new', version: 'Version {{version}}' },
+  prepare: { messages: ['Preparing your feed…', 'Picking today’s good things…', 'Ready. No rush.'] },
 }

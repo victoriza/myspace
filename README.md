@@ -24,11 +24,22 @@ Installable web app (PWA): React + Vite + TypeScript, deployed on Vercel.
 
 The feed day starts at 07:00 (`openHour` in settings).
 
+## Sources
+
+All suggested sources live in one file: **[`src/lib/sources.ts`](src/lib/sources.ts)** (about 60: news, newsletters, pictures and YouTube channels).
+Each entry has its name, language, type, interest (`topic`), angle (good news / progress / solution), feed URL,
+home page (`site`, used to find the feed again if the URL breaks), YouTube channel, whether it starts on, and how often it posts.
+The one-line description shown when choosing sources is in **[`src/lib/sourceInfo.ts`](src/lib/sourceInfo.ts)** (ES / EN / CA).
+
+Interests (14, in two groups) are in [`src/lib/types.ts`](src/lib/types.ts) (`INTEREST_GROUPS`).
+The bar for a new source: calm, evidence-based, a few posts a day at most, and it doesn't end up mostly in "Hidden today".
+
 ## Project layout
 
 ```
 api/relay.ts            Vercel function: RSS relay
 src/lib/sources.ts      Suggested sources (edit this list)
+src/lib/sourceInfo.ts   One-line description per source (ES/EN/CA)
 src/lib/filters.ts      Calm + politics filters, ES/EN/CA word lists
 src/lib/feed.ts         The 5-step feed pipeline
 src/lib/parse.ts        RSS/Atom/YouTube parsing, feed discovery

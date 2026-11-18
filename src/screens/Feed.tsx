@@ -4,7 +4,7 @@ import { BottomNav, Icon, TypeTag } from '../components/ui'
 import { Picture, SourceIcon, sourceSite, useOnline, videoLength } from '../components/bits'
 import { useInstallOffer } from '../lib/install'
 import { UpdateBar, WhatsNew } from '../components/Updates'
-import { Greeting, LivingLogo, MiniLoader } from '../components/Cosy'
+import { Greeting, LivingLogo, MiniLoader, Preparing } from '../components/Cosy'
 import { SkyBackdrop } from '../components/Sky'
 import { sceneAt, skyColorAt, skyText } from '../lib/sky'
 import { totalMinutes } from '../lib/feed'
@@ -16,7 +16,11 @@ import { useApp } from '../state'
 
 export function Feed() {
   const { t } = useTranslation()
-  const { today, seen, loading, markSeen } = useApp()
+  const { today, seen, loading, markSeen, feedChanged, clearFeedChanged } = useApp()
+  // Back from Personalizar with changes: a calm "preparing your feed" moment, then the cards rise in.
+  const [preparing, setPreparing] = useState(() => feedChanged())
+  const [revealed, setRevealed] = useState(false)
+  useEffect(() => clearFeedChanged(), [clearFeedChanged])
   const [filter, setFilter] = useState<ContentType | 'all'>('all')
   // "Already seen" starts folded into one quiet line.
   const [showOld, setShowOld] = useState(false)
@@ -24,8 +28,8 @@ export function Feed() {
   // Grouping (new vs "seen earlier") uses what was seen when the feed opened,
   // so cards don't jump around while you scroll and they get marked as seen.
   const [seenAtOpen] = useState(() => ({ ...seen }))
-  // Cards rise in gently on the first open of the day only.
-  const [arrive] = useState(() => {
+  // Cards rise in gently on the first open of the day (and after the "preparing" scene).
+  const [arriveDay] = useState(() => {
     const day = today?.day
     if (!day) return false
     let last: string | null = null
@@ -38,6 +42,7 @@ export function Feed() {
     return last !== day
   })
 
+  const arrive = arriveDay || revealed
   const items = useMemo(() => today?.items ?? [], [today])
   const presentTypes = useMemo(() => [...new Set(items.map((i) => i.type))], [items])
   const inFilter = items.filter((i) => filter === 'all' || i.type === filter)
@@ -104,7 +109,8 @@ export function Feed() {
       {!online ? <p className="quiet-line small" role="status">{t('offline')}</p> : null}
       {loading && today && online ? <MiniLoader /> : null}
 
-      <div className="stack">
+      {preparing ? <Preparing busy={loading} onDone={() => { setRevealed(true); setPreparing(false) }} /> : null}
+      <div className="stack" key={preparing ? 'waiting' : 'shown'}>
         <WhatsNew />
         {fresh.map((item, i) => (
           <Card key={item.id} item={item} isSeen={!!seen[item.id]} cardRef={register(item.id, !!seen[item.id])} arriveIndex={arrive ? i : undefined} />

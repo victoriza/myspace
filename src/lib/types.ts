@@ -80,6 +80,8 @@ export interface FeedItem {
   videoId?: string
   /** Length in minutes, when the source tells us (videos). */
   minutes?: number
+  /** Words of text the feed sent for this item (full description or content, before the summary is cut). */
+  words?: number
   /** Exact length in seconds (videos), when known. */
   seconds?: number
   isShort?: boolean

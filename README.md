@@ -34,6 +34,11 @@ The one-line description shown when choosing sources is in **[`src/lib/sourceInf
 Interests (14, in two groups) are in [`src/lib/types.ts`](src/lib/types.ts) (`INTEREST_GROUPS`).
 The bar for a new source: calm, evidence-based, a few posts a day at most, and it doesn't end up mostly in "Hidden today".
 
+## Tests
+
+- `npm test` — unit tests (Vitest): feed picking, filters, parsing, sky contrast every 15 minutes, speech helpers.
+- `npm run test:e2e` — browser tests (Playwright, phone size, mocked feeds): the home screen in **light and dark mode** at 7:30, 11:00, 15:00, 19:40 and 22:30. Text on the sky is checked by real pixel contrast (WCAG AA), cards and every other screen with axe. First time: `npx playwright install chromium`.
+
 ## Project layout
 
 ```

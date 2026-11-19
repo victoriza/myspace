@@ -683,3 +683,21 @@ a.more-row { color: inherit; text-decoration: none; }
 .listening-feed .feed-main { padding-bottom: 110px; }
 /* On the home sky, the listen button follows the sky, not the theme (phone in dark mode + light morning sky). */
 :root[data-theme='night'] .sky-home:not(.sky-dark) .listen-pill { background: #fff8e8; border-color: #e3d6b8; color: #5a430e; }
+
+/* ---------- v0.12.3: on the home sky, what sits on the sky follows the sky, not the theme ----------
+   Phone in dark mode + light day sky: text drawn straight on the sky/sea uses day ink; cards stay in the evening theme. */
+:root[data-theme='night'] .sky-home:not(.sky-dark) {
+  --ink: #172036; --ink-2: #3a4358; --muted: #4d5568; --line: rgba(23, 32, 54, 0.1); --line-2: rgba(23, 32, 54, 0.24); --teal: #2f6f7e;
+}
+:root[data-theme='night'] .sky-home:not(.sky-dark) :is(.card, .done-card, .feed-end, .seen-toggle, .chip) {
+  --ink: #eceef6; --ink-2: #c9cfe2; --muted: #a4adc8; --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.2); --teal: #8fd0dc;
+}
+:root[data-theme='night'] .sky-home:not(.sky-dark) .update-bar { background: #eef0f6; color: #172036; }
+/* The end of the feed sits on whatever part of the sky is behind it (sand, sunset orange, dusk sea, night):
+   give those quiet lines a soft backing of their own so they're always readable. */
+.sky-home .feed-end { align-self: center; padding: 8px 18px 4px; border-radius: 20px; background: color-mix(in srgb, var(--surface) 96%, transparent); box-shadow: 0 0 0 1px var(--line); }
+.sky-home .feed-end .muted { color: var(--muted); }
+.sky-home .finish-link { color: var(--ink-2); text-decoration-color: var(--line-2); }
+.sky-home .seen-toggle { width: auto; align-self: center; margin: 4px auto; padding: 0 16px; border-radius: 22px; background: color-mix(in srgb, var(--surface) 96%, transparent); box-shadow: 0 0 0 1px var(--line); color: var(--ink-2); }
+.sky-home .seen-toggle-line { display: none; }
+.sky-home.sky-dark .seen-toggle { color: var(--ink-2); }

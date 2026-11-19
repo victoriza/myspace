@@ -29,7 +29,7 @@
 - `src/lib/sky.ts` + `src/components/Sky.tsx` — the home sky: four looks (dawn, day, sunset, night) blended by the hour, sun arc / moon / stars / clouds, waves on the horizon (measured under the chips in `Feed.tsx`), light text and dark page at night.
 - `seo/landing.ts` — build-time landing pages for Google and link previews (`/`, `/en/`, `/ca/` at https://myspace.victoriza.com): titles, descriptions, hreflang, canonical, Open Graph image (`public/og-image.png`), JSON-LD; `public/robots.txt`, `public/sitemap.xml`. Opening `/en/` or `/ca/` starts the app in that language.
 - `src/lib/update.ts` + `src/components/Updates.tsx` — new-version notice (service worker in "prompt" mode) and the one-time "What's new" card.
-- Tests: `npm test` (Vitest). Build: `npm run build`.
+- Tests: `npm test` (Vitest). Build: `npm run build`. Browser tests: `npm run test:e2e` (Playwright, `e2e/`): home screen in light **and dark mode** at 5 times of day — text on the sky by real pixel contrast, cards and all other screens with axe. Run before every release. On the home sky, anything drawn straight on the sky must follow the sky (`.sky-home:not(.sky-dark)` resets the ink vars under dark mode); give it its own backing if it can sit on changing backgrounds.
 
 ## Releasing a version
 1. Bump `version` in `package.json`.

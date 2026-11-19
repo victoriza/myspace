@@ -57,5 +57,7 @@ export default defineConfig({
   ],
   test: {
     environment: 'jsdom',
+    // Browser tests (dark mode, contrast on the sky) run with Playwright: npm run test:e2e
+    exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
   },
 })

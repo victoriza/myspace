@@ -24,7 +24,10 @@ function parseEntry(el: Element, source: Source): FeedItem | null {
 
   const contentHtml = childText(el, 'encoded') || (child(el, 'content')?.getAttribute('type')?.includes('html') ? childText(el, 'content') : '') || ''
   const descHtml = childText(el, 'description') || childText(el, 'summary') || mediaDescription(el) || ''
-  const summary = truncate(summaryText(descHtml || contentHtml), 280)
+  const fullText = summaryText(descHtml || contentHtml)
+  const summary = truncate(fullText, 280)
+  const contentWords = contentHtml ? htmlToText(contentHtml).split(' ').filter(Boolean).length : 0
+  const words = Math.max(contentWords, fullText.split(' ').filter(Boolean).length)
   const content = contentHtml && htmlToText(contentHtml).length > 600 ? contentHtml : undefined
 
   const videoId = childText(el, 'videoId') || undefined
@@ -41,6 +44,7 @@ function parseEntry(el: Element, source: Source): FeedItem | null {
     date,
     summary,
     content,
+    words,
     image: entryImage(el, descHtml + contentHtml),
     author,
     videoId,

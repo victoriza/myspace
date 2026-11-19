@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.12.3',
+    notes: {
+      es: ['Arreglado: con el móvil en modo oscuro, los textos sobre el cielo (filtros, «Quedan…», «Terminar por hoy») se veían mal de día.', 'Arreglado: la regla de 50 palabras escondía artículos buenos que solo traen resumen. Vuelven al feed.'],
+      en: ['Fixed: with your phone in dark mode, text on the sky (filters, “left for today”, “Finish for today”) was hard to see by day.', 'Fixed: the 50-word rule was hiding good articles that only come with a summary. They’re back.'],
+      ca: ['Arreglat: amb el mòbil en mode fosc, els textos sobre el cel (filtres, «Queden…», «Acabar per avui») es veien malament de dia.', 'Arreglat: la regla de 50 paraules amagava articles bons que només porten resum. Tornen al feed.'],
+    },
+  },
+  {
     version: '0.12.2',
     notes: {
       es: ['Los resúmenes empiezan por la noticia: sin la línea de autor («Por…») ni el «La entrada… se publicó primero en…» del final.'],

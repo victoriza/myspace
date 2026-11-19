@@ -58,13 +58,15 @@ export interface FilterOutcome {
 }
 
 /**
- * Articles need at least this many words of text the app can show (the full text if the feed has it,
- * otherwise the summary). Below that there's nothing to read here ("ut2004.dev" with no text).
+ * Articles need at least this many words of text from their feed (the full article if the feed has it,
+ * otherwise the full description, counted before the card summary is cut). Below that there's nothing to read here ("ut2004.dev" with no text).
  * Pictures and videos don't count words.
  */
 export const MIN_WORDS = 50
 const TEXT_TYPES = new Set<FeedItem['type']>(['news', 'newsletter', 'tech'])
-export function readableWords(item: Pick<FeedItem, 'content' | 'summary'>): number {
+export function readableWords(item: Pick<FeedItem, 'content' | 'summary' | 'words'>): number {
+  // The summary is stored cut to ~280 characters: count the full text the feed sent when we know it.
+  if (item.words) return item.words
   const text = (item.content ? item.content.replace(/<[^>]+>/g, ' ') : item.summary || '').trim()
   return text ? text.split(/\s+/).length : 0
 }

@@ -54,7 +54,19 @@ export function estimateMinutes(item: FeedItem): number {
 
 export interface FilterOutcome {
   kept: FeedItem[]
-  hidden: { item: FeedItem; reason: 'type' | 'old' | 'seen' | 'politics' | 'calm' | 'short' | 'channel'; kind?: HiddenKind; word?: string }[]
+  hidden: { item: FeedItem; reason: 'type' | 'old' | 'seen' | 'politics' | 'calm' | 'short' | 'channel' | 'thin'; kind?: HiddenKind; word?: string }[]
+}
+
+/**
+ * Articles need at least this many words of text the app can show (the full text if the feed has it,
+ * otherwise the summary). Below that there's nothing to read here ("ut2004.dev" with no text).
+ * Pictures and videos don't count words.
+ */
+export const MIN_WORDS = 50
+const TEXT_TYPES = new Set<FeedItem['type']>(['news', 'newsletter', 'tech'])
+export function readableWords(item: Pick<FeedItem, 'content' | 'summary'>): number {
+  const text = (item.content ? item.content.replace(/<[^>]+>/g, ' ') : item.summary || '').trim()
+  return text ? text.split(/\s+/).length : 0
 }
 
 /** Steps 2 + 3: keep only new items, then apply the person's filters. */
@@ -73,6 +85,7 @@ export function filterItems(items: FeedItem[], settings: Settings, seen: Record<
     else if (seen[item.id]) hidden.push({ item, reason: 'seen' })
     else if (item.type === 'video' && settings.skipShorts && item.isShort) hidden.push({ item, reason: 'short' })
     else if (settings.blockedChannels.includes(item.sourceId)) hidden.push({ item, reason: 'channel' })
+    else if (TEXT_TYPES.has(item.type) && readableWords(item) < MIN_WORDS) hidden.push({ item, reason: 'thin', kind: 'thin' })
     else {
       const politics = settings.hidePolitics ? politicalMatch(item.title, item.summary) : null
       if (politics) {

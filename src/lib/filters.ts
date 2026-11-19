@@ -187,7 +187,7 @@ export function threshold(s: Strictness): number {
   return s === 'strict' ? 2 : s === 'relaxed' ? 4 : 3
 }
 
-export type HiddenKind = 'politics' | 'blocked' | 'pseudo' | 'hype' | 'clickbait' | 'guide' | 'style'
+export type HiddenKind = 'politics' | 'blocked' | 'pseudo' | 'hype' | 'clickbait' | 'guide' | 'style' | 'thin'
 
 /** Why a calm-filter score was too high, as a kind and the main word (for "Hidden today"). */
 export function explain(reasons: string[]): { kind: HiddenKind; word?: string } {

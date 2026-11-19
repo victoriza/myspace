@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDailyFeed, estimateMinutes, nextItem, orderMixed, pickDaily, totalMinutes } from './feed'
+import { readableWords, buildDailyFeed, filterItems, estimateMinutes, nextItem, orderMixed, pickDaily, totalMinutes } from './feed'
 import { compareVersions, notesSince } from './changelog'
 import { findDurationSeconds, findLanguage, parseFeed } from './parse'
 import { defaultEnabledSources, interestPatch, sourcesForTopic, SUGGESTED_SOURCES } from './sources'
@@ -10,8 +10,9 @@ import { INTERESTS, type FeedItem, type Source, type Topic } from './types'
 const now = Date.UTC(2026, 10, 16, 10)
 const H = 60 * 60 * 1000
 
+const LONG = Array.from({ length: 60 }, (_, k) => 'word' + k).join(' ')
 function item(i: number, over: Partial<FeedItem> = {}): FeedItem {
-  return { id: 'i' + i, sourceId: 's' + (i % 3), sourceName: 'S', type: 'news', title: 'Calm title ' + i, link: 'https://x/' + i, date: now - i * H, summary: '', ...over }
+  return { id: 'i' + i, sourceId: 's' + (i % 3), sourceName: 'S', type: 'news', title: 'Calm title ' + i, link: 'https://x/' + i, date: now - i * H, summary: LONG, ...over }
 }
 
 describe('feed pipeline', () => {
@@ -80,8 +81,8 @@ describe('feed pipeline', () => {
   it('shows what is new only for versions newer than the last one seen', () => {
     expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
     expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
-    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.11.0', '0.10.0'])
-    expect(notesSince('0.11.0')).toEqual([])
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.12.0', '0.11.0'])
+    expect(notesSince('0.12.0')).toEqual([])
   })
 
   it('leaves out switched-off interests (videogames start off)', () => {
@@ -234,13 +235,13 @@ describe('v0.10 sharing and contact', () => {
     const { issueUrl, landingUrl } = await import('./share')
     const url = issueUrl('Fuente sugerida: ', 'Enlace:\n', 'ca', 'about')
     expect(url.startsWith('https://github.com/victoriza/myspace/issues/new?title=Fuente%20sugerida')).toBe(true)
-    expect(decodeURIComponent(url)).toContain('Space Feed 0.11.0 · ca · about')
+    expect(decodeURIComponent(url)).toContain('Space Feed 0.12.0 · ca · about')
     expect(landingUrl('es')).toBe('https://myspace.victoriza.com/')
     expect(landingUrl('ca')).toBe('https://myspace.victoriza.com/ca/')
   })
   it('orders 0.10 after 0.9', async () => {
     const { notesSince } = await import('./changelog')
-    expect(notesSince('0.9.3').map((e) => e.version)).toEqual(['0.11.0', '0.10.0'])
+    expect(notesSince('0.9.3').map((e) => e.version)).toEqual(['0.12.0', '0.11.0'])
   })
 })
 
@@ -263,5 +264,22 @@ describe('v0.11 listening', () => {
     expect(ca.fallback).toBe(true)
     expect(ca.lang).toBe('es')
     expect(pickVoice([...voices, v('Montserrat', 'ca-ES')], 'ca')).toMatchObject({ fallback: false, lang: 'ca' })
+  })
+})
+
+describe('too-short articles', () => {
+  it('keeps articles with ≥ 50 words to show, hides shorter ones as "thin"; pictures and videos are exempt', () => {
+    const s = { ...defaultSettings(), types: { news: true, video: true, newsletter: true, tech: true, picture: true } }
+    const items = [
+      item(1, { summary: 'Only a few words here.' }),
+      item(2, { summary: '', content: '<p>' + LONG + '</p>' }),
+      item(3, { type: 'picture', summary: '' }),
+      item(4, { type: 'video', summary: '', minutes: 5 }),
+      item(5),
+    ]
+    const { kept, hidden } = filterItems(items, s, {}, now)
+    expect(kept.map((i) => i.id).sort()).toEqual(['i2', 'i3', 'i4', 'i5'])
+    expect(hidden.find((h) => h.item.id === 'i1')).toMatchObject({ reason: 'thin', kind: 'thin' })
+    expect(readableWords({ summary: 'a b c' })).toBe(3)
   })
 })

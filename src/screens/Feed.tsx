@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { BottomNav, Icon, TypeTag } from '../components/ui'
 import { Picture, SourceIcon, sourceSite, useOnline, videoLength } from '../components/bits'
 import { useInstallOffer } from '../lib/install'
+import { FeedListen } from '../components/Listen'
 import { saveClosedDay } from '../lib/storage'
 import { UpdateBar, WhatsNew } from '../components/Updates'
 import { Greeting, LivingLogo, MiniLoader, Preparing } from '../components/Cosy'
@@ -16,8 +17,8 @@ import { itemLang, sourceMeta } from '../lib/sources'
 import { useApp } from '../state'
 
 export function Feed() {
-  const { t } = useTranslation()
-  const { today, seen, loading, feedChanged, clearFeedChanged } = useApp()
+  const { t, i18n } = useTranslation()
+  const { today, seen, loading, feedChanged, clearFeedChanged, markSeen } = useApp()
   // Back from Personalizar with changes: a calm "preparing your feed" moment, then the cards rise in.
   const [preparing, setPreparing] = useState(() => feedChanged())
   const [revealed, setRevealed] = useState(false)
@@ -103,6 +104,12 @@ export function Feed() {
           <span className="muted small">
             <strong className="ink">{t('feed.todayTime', { count: totalMinutes(items) })}</strong> · {t('feed.newCount', { count: newCount })}
           </span>
+        </div>
+      ) : null}
+
+      {fresh.length && !preparing ? (
+        <div className="feed-listen-row">
+          <FeedListen items={fresh} appLang={i18n.language as 'es'} onHeard={markSeen} />
         </div>
       ) : null}
 
@@ -244,7 +251,7 @@ function Card({ item, isSeen, arriveIndex, seenBefore }: { item: FeedItem; isSee
   if (item.type === 'video') {
     const length = videoLength(item)
     return (
-      <button className={`card video-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
+      <button data-item={item.id} className={`card video-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
         <Picture src={item.image} className="thumb">
           <span className="play">{Icon.play}</span>
           {length ? <span className="duration">{length}</span> : null}
@@ -260,7 +267,7 @@ function Card({ item, isSeen, arriveIndex, seenBefore }: { item: FeedItem; isSee
 
   if (item.type === 'picture') {
     return (
-      <button className={`card picture-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
+      <button data-item={item.id} className={`card picture-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
         <Picture src={item.image} title={item.title} className="picture" />
         <span className="picture-text">
           {top}
@@ -272,7 +279,7 @@ function Card({ item, isSeen, arriveIndex, seenBefore }: { item: FeedItem; isSee
   }
 
   return (
-    <button className={`card text-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
+    <button data-item={item.id} className={`card text-card ${isSeen ? 'is-seen' : ''}${arriveCls}`} style={arriveStyle} onClick={open}>
       {top}
       <span className="title" lang={textLang}>{item.title}</span>
       {item.summary ? <span className="summary" lang={textLang}>{item.summary}</span> : null}

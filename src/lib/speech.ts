@@ -106,6 +106,13 @@ class ScreenAwake {
   }
 }
 
+/** A piece of text in one language (a part can mix: "Buena noticia, de Positive News." + an English title). */
+export interface Segment {
+  text: string
+  lang: Lang
+}
+type Utter = { text: string; lang: Lang }
+
 export interface SpeakerState {
   status: 'idle' | 'playing' | 'paused' | 'ended'
   part: number
@@ -117,7 +124,10 @@ export interface SpeakerState {
  * "Pause" cancels and remembers the sentence (pause() is unreliable on Android), "play" starts that sentence again.
  */
 export class Speaker {
-  private sentencesOf: string[][]
+  private sentencesOf: Utter[][]
+  private voices: SpeechSynthesisVoice[]
+  /** Called when a part has been read to the end (not skipped). */
+  onPartDone?: (part: number) => void
   private part = 0
   private sentence = 0
   private status: SpeakerState['status'] = 'idle'
@@ -127,10 +137,18 @@ export class Speaker {
   rate: number
   voice: VoiceChoice
 
-  constructor(parts: string[], voice: VoiceChoice, rate = loadRate()) {
+  constructor(parts: (string | Segment[])[], voice: VoiceChoice, rate = loadRate(), voices: SpeechSynthesisVoice[] = []) {
     this.voice = voice
     this.rate = rate
-    this.sentencesOf = parts.map((p) => sentences(p, voice.lang))
+    this.voices = voices
+    this.sentencesOf = parts.map((p) =>
+      (typeof p === 'string' ? [{ text: p, lang: voice.lang }] : p).flatMap((seg) => sentences(seg.text, seg.lang).map((text) => ({ text, lang: seg.lang }))),
+    )
+  }
+
+  private voiceFor(lang: Lang): VoiceChoice {
+    if (lang === this.voice.lang || (this.voice.fallback && lang === 'ca')) return this.voice
+    return pickVoice(this.voices.length ? this.voices : speechSynthesis.getVoices(), lang)
   }
 
   get state(): SpeakerState {
@@ -220,14 +238,17 @@ export class Speaker {
       return
     }
     const token = ++this.token
-    const u = new SpeechSynthesisUtterance(this.sentencesOf[this.part][this.sentence])
-    if (this.voice.voice) u.voice = this.voice.voice
-    u.lang = BCP47[this.voice.lang]
+    const bit = this.sentencesOf[this.part][this.sentence]
+    const v = this.voiceFor(bit.lang)
+    const u = new SpeechSynthesisUtterance(bit.text)
+    if (v.voice) u.voice = v.voice
+    u.lang = BCP47[v.lang]
     u.rate = this.rate
     const next = () => {
       if (token !== this.token || this.status !== 'playing') return
       this.sentence++
       if (this.sentence >= this.sentencesOf[this.part].length) {
+        this.onPartDone?.(this.part)
         this.part++
         this.sentence = 0
         this.emit()

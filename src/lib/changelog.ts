@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.12.0',
+    notes: {
+      es: ['Escucha el feed de hoy: el móvil te lo cuenta como un resumen tranquilo, cosa a cosa. Lo que escuchas cuenta como visto.', 'Fuera los artículos casi vacíos: si no hay al menos 50 palabras que leer, no entran en el feed.'],
+      en: ['Listen to today’s feed: your phone reads it as a calm briefing, one thing at a time. What you hear counts as seen.', 'No more near-empty articles: under 50 words to read, they stay out of the feed.'],
+      ca: ['Escolta el feed d’avui: el mòbil te l’explica com un resum tranquil, cosa a cosa. El que escoltes compta com a vist.', 'Fora els articles gairebé buits: si no hi ha almenys 50 paraules per llegir, no entren al feed.'],
+    },
+  },
+  {
     version: '0.11.0',
     notes: {
       es: ['Escucha los artículos: toca «Escuchar» bajo el título y el móvil te los lee, párrafo a párrafo.', 'Usa la voz de tu teléfono, sin internet extra. Deja la pantalla encendida mientras escuchas.'],

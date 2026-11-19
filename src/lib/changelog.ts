@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.11.0',
+    notes: {
+      es: ['Escucha los artículos: toca «Escuchar» bajo el título y el móvil te los lee, párrafo a párrafo.', 'Usa la voz de tu teléfono, sin internet extra. Deja la pantalla encendida mientras escuchas.'],
+      en: ['Listen to articles: tap “Listen” under the title and your phone reads it to you, paragraph by paragraph.', 'It uses your phone’s own voice. Keep the screen on while you listen.'],
+      ca: ['Escolta els articles: toca «Escoltar» sota el títol i el mòbil te’ls llegeix, paràgraf a paràgraf.', 'Fa servir la veu del teu telèfon. Deixa la pantalla encesa mentre escoltes.'],
+    },
+  },
+  {
     version: '0.10.0',
     notes: {
       es: ['Comparte lo que lees con un toque, o comparte Space Feed desde Más.', '«Terminar por hoy» al final del feed, para cerrar el día sin abrirlo todo.', 'En «Quién lo hace» puedes sugerir una fuente o avisar de un fallo.'],

@@ -80,8 +80,8 @@ describe('feed pipeline', () => {
   it('shows what is new only for versions newer than the last one seen', () => {
     expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
     expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
-    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.10.0', '0.9.3'])
-    expect(notesSince('0.10.0')).toEqual([])
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.11.0', '0.10.0'])
+    expect(notesSince('0.11.0')).toEqual([])
   })
 
   it('leaves out switched-off interests (videogames start off)', () => {
@@ -234,12 +234,34 @@ describe('v0.10 sharing and contact', () => {
     const { issueUrl, landingUrl } = await import('./share')
     const url = issueUrl('Fuente sugerida: ', 'Enlace:\n', 'ca', 'about')
     expect(url.startsWith('https://github.com/victoriza/myspace/issues/new?title=Fuente%20sugerida')).toBe(true)
-    expect(decodeURIComponent(url)).toContain('Space Feed 0.10.0 · ca · about')
+    expect(decodeURIComponent(url)).toContain('Space Feed 0.11.0 · ca · about')
     expect(landingUrl('es')).toBe('https://myspace.victoriza.com/')
     expect(landingUrl('ca')).toBe('https://myspace.victoriza.com/ca/')
   })
   it('orders 0.10 after 0.9', async () => {
     const { notesSince } = await import('./changelog')
-    expect(notesSince('0.9.3').map((e) => e.version)).toEqual(['0.10.0'])
+    expect(notesSince('0.9.3').map((e) => e.version)).toEqual(['0.11.0', '0.10.0'])
+  })
+})
+
+describe('v0.11 listening', () => {
+  it('splits text into sentences and long runs at commas', async () => {
+    const { sentences } = await import('./speech')
+    expect(sentences('Hola. ¿Qué tal? Bien, gracias.', 'es')).toEqual(['Hola.', '¿Qué tal?', 'Bien, gracias.'])
+    const long = Array.from({ length: 40 }, (_, i) => `parte ${i}`).join(', ')
+    const parts = sentences(long, 'es')
+    expect(parts.length).toBeGreaterThan(1)
+    expect(parts.every((p) => p.length <= 260)).toBe(true)
+  })
+  it('picks a voice for the language, natural ones first; Catalan falls back to Spanish', async () => {
+    const { pickVoice } = await import('./speech')
+    const v = (name: string, lang: string, localService = true) => ({ name, lang, localService, default: false, voiceURI: name }) as SpeechSynthesisVoice
+    const voices = [v('Jorge', 'es-ES'), v('Google español', 'es-ES', false), v('Daniel', 'en-GB')]
+    expect(pickVoice(voices, 'es').voice?.name).toBe('Google español')
+    expect(pickVoice(voices, 'en').voice?.name).toBe('Daniel')
+    const ca = pickVoice(voices, 'ca')
+    expect(ca.fallback).toBe(true)
+    expect(ca.lang).toBe('es')
+    expect(pickVoice([...voices, v('Montserrat', 'ca-ES')], 'ca')).toMatchObject({ fallback: false, lang: 'ca' })
   })
 })

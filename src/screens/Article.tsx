@@ -6,6 +6,7 @@ import { ShareButton, SourceIcon, sourceSite } from '../components/bits'
 import { firstSentence } from '../lib/parse'
 import { readingMinutes, timeAgo } from '../lib/time'
 import { NextBar } from '../components/NextBar'
+import { Listen } from '../components/Listen'
 import { RemoveSource } from '../components/RemoveSource'
 import { back, go } from '../router'
 import { useApp } from '../state'
@@ -18,6 +19,8 @@ export function Article({ id }: { id: string }) {
   const { itemById, markSeen } = useApp()
   const item = itemById(id)
   const [size, setSize] = useState(1)
+  const contentRef = useRef<HTMLDivElement | null>(null)
+  const titleRef = useRef<HTMLHeadingElement | null>(null)
 
   useEffect(() => {
     if (item) markSeen(item.id)
@@ -67,7 +70,10 @@ export function Article({ id }: { id: string }) {
             {html ? ` · ${t('article.minRead', { count: minutes })}` : ''}
           </span>
         </span>
-        <h1 className="reader-title" lang={textLang}>{item.title}</h1>
+        <h1 className="reader-title" lang={textLang} ref={titleRef}>{item.title}</h1>
+        {item.type !== 'picture' && (html || item.summary) ? (
+          <Listen contentRef={contentRef} titleRef={titleRef} lang={textLang ?? (i18n.language as 'es')} words={(html ? words : item.summary.split(/\s+/).length) + item.title.split(/\s+/).length} />
+        ) : null}
         {item.author ? <p className="muted small">{item.author}</p> : null}
 
         {showInShort ? (
@@ -78,10 +84,10 @@ export function Article({ id }: { id: string }) {
         ) : null}
 
         {html ? (
-          <div className="reader-content" lang={textLang} style={{ fontSize: SIZES[size] }} dangerouslySetInnerHTML={{ __html: html }} />
+          <div className="reader-content" lang={textLang} ref={contentRef} style={{ fontSize: SIZES[size] }} dangerouslySetInnerHTML={{ __html: html }} />
         ) : (
           <div className="stack-tight">
-            {item.summary ? <p className="reader-content" lang={textLang} style={{ fontSize: SIZES[size] }}>{item.summary}</p> : null}
+            {item.summary ? <p className="reader-content" lang={textLang} ref={contentRef} style={{ fontSize: SIZES[size] }}>{item.summary}</p> : null}
             {item.type !== 'picture' ? <p className="muted small">{t('article.summaryOnly')}</p> : null}
           </div>
         )}

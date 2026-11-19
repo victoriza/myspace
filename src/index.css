@@ -639,3 +639,26 @@ h1[tabindex='-1']:focus { outline: none; }
 .finish-link { min-height: 44px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--line-2); color: var(--ink-2); }
 .sky-home.sky-dark .finish-link { color: #c9d1ea; text-decoration-color: rgba(255,255,255,.3); }
 a.more-row { color: inherit; text-decoration: none; }
+
+/* ---------- v0.11: listen to an article (phone's own voice) ---------- */
+.listen-pill { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 12px; border-radius: 22px; border: 1px solid #e3d6b8; background: #fff8e8; color: #5a430e; font: inherit; font-size: 14px; font-weight: 600; }
+.listen-pill-space { display: block; height: 0; }
+.reader-content .speaking, .reader-title.speaking, .reader-content.speaking { --hl: rgba(233, 185, 73, 0.17); background: var(--hl); box-shadow: -10px 0 0 var(--hl), 10px 0 0 var(--hl); border-radius: 6px; transition: background .4s ease; }
+:root[data-theme='night'] .speaking { --hl: rgba(241, 210, 122, 0.13); }
+.listen-player { position: fixed; left: 0; right: 0; max-width: 496px; margin: 0 auto; z-index: 25; width: calc(100% - 24px); box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; padding: 10px 12px 8px; border-radius: 22px; background: #1e2952; color: #fff; box-shadow: 0 14px 30px -14px rgba(10, 14, 30, 0.55); animation: sf-fadein .35s ease both; }
+.listen-progress { height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.18); overflow: hidden; }
+.listen-progress span { display: block; height: 100%; background: #f1d27a; transform-origin: left; transition: transform .4s ease; }
+.listen-top { display: flex; align-items: center; gap: 4px; }
+.listen-label { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 12.5px; line-height: 1.3; }
+.listen-label strong { font-weight: 600; }
+.listen-label span { color: #b9c2dc; overflow: hidden; text-overflow: ellipsis; }
+.listen-speed { min-width: 52px; height: 44px; padding: 0 10px; border-radius: 22px; border: 1px solid rgba(255, 255, 255, 0.3); background: none; color: #fff; font: inherit; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.listen-icon { width: 44px; height: 44px; border: 0; background: none; color: #fff; display: grid; place-items: center; border-radius: 22px; }
+.listen-icon:disabled { opacity: .35; }
+.listen-controls { display: flex; align-items: center; justify-content: center; gap: 22px; }
+.listen-main { width: 52px; height: 52px; border: 0; border-radius: 26px; background: #f1d27a; color: #141c3d; display: grid; place-items: center; }
+.listen-hint { margin: 0; text-align: center; font-size: 11.5px; color: #9ea8c7; }
+.listening .reader-body { padding-bottom: 210px; }
+:root[data-theme='night'] .listen-pill { background: rgba(241, 210, 122, 0.12); border-color: rgba(241, 210, 122, 0.3); color: #f1d27a; }
+:root[data-theme='night'] .listen-player { background: #26315c; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 14px 30px -14px rgba(0, 0, 0, 0.6); }
+@media (prefers-reduced-motion: reduce) { .listen-player { animation: none; } .listen-progress span, .reader-content .speaking { transition: none; } }

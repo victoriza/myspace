@@ -24,7 +24,7 @@ function parseEntry(el: Element, source: Source): FeedItem | null {
 
   const contentHtml = childText(el, 'encoded') || (child(el, 'content')?.getAttribute('type')?.includes('html') ? childText(el, 'content') : '') || ''
   const descHtml = childText(el, 'description') || childText(el, 'summary') || mediaDescription(el) || ''
-  const summary = truncate(htmlToText(descHtml || contentHtml), 280)
+  const summary = truncate(summaryText(descHtml || contentHtml), 280)
   const content = contentHtml && htmlToText(contentHtml).length > 600 ? contentHtml : undefined
 
   const videoId = childText(el, 'videoId') || undefined
@@ -93,6 +93,33 @@ function entryImage(el: Element, html: string): string | undefined {
   if (enc) return enc.getAttribute('url') || undefined
   const m = html.match(/<img[^>]+src=["']([^"']+)["']/i)
   return m && /^https:/.test(m[1]) ? m[1] : undefined
+}
+
+const BYLINE = /^(?:written\s+)?(?:by|por|per|escrito\s+por|escrit\s+per|text\s+by|words\s+by)\s+\S/i
+/** "The post X appeared first on Y." (WordPress) and its Spanish/Catalan versions. */
+const WP_FOOTER = /\s*(?:The post|La entrada|L[’']entrada)\s.+?\s(?:appeared first on|se publicó primero en|apareció primero en|va aparèixer primer a|es va publicar primer a)\s.+$/i
+
+/**
+ * Text for a card's summary: without a leading author line ("BY THE OPTIMIST DAILY EDITORIAL TEAM", "Por Ana López")
+ * or the WordPress footer, so the card starts with the news itself.
+ */
+export function summaryText(html: string): string {
+  if (!html) return ''
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  // A short first block that is just a byline (<p><strong>By …</strong></p>).
+  const first = doc.body.firstElementChild
+  const firstText = clean(first?.textContent || '')
+  if (first && BYLINE.test(firstText) && firstText.split(' ').length <= 10 && clean(doc.body.textContent || '').length > firstText.length + 20) first.remove()
+  return stripByline(clean(doc.body.textContent || '')).replace(WP_FOOTER, '').trim()
+}
+
+/** The same, for plain text: an ALL-CAPS byline run, or "By Name — " / "Por Nombre | ". */
+export function stripByline(text: string): string {
+  const caps = text.match(/^(?:BY|POR|PER)\s+(?:[A-ZÀ-ÖØ-Þ0-9'’.&-]+\s+){0,10}?(?=[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ])/)
+  if (caps) return text.slice(caps[0].length)
+  const named = text.match(/^(?:By|Por|Per)\s+[^.|·—–\n]{2,60}?\s+[|·—–-]\s+/)
+  if (named) return text.slice(named[0].length)
+  return text
 }
 
 export function htmlToText(html: string): string {

@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.12.2',
+    notes: {
+      es: ['Los resúmenes empiezan por la noticia: sin la línea de autor («Por…») ni el «La entrada… se publicó primero en…» del final.'],
+      en: ['Summaries start with the news: no author line (“By…”) and no “The post… appeared first on…” at the end.'],
+      ca: ['Els resums comencen per la notícia: sense la línia d’autor («Per…») ni el «L’entrada… es va publicar primer a…» del final.'],
+    },
+  },
+  {
     version: '0.12.1',
     notes: {
       es: ['«Escuchar el feed de hoy» ahora se ve bien con el móvil en modo oscuro y el cielo claro de la mañana.'],

@@ -81,8 +81,8 @@ describe('feed pipeline', () => {
   it('shows what is new only for versions newer than the last one seen', () => {
     expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
     expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
-    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.12.1', '0.12.0'])
-    expect(notesSince('0.12.1')).toEqual([])
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.12.2', '0.12.1'])
+    expect(notesSince('0.12.2')).toEqual([])
   })
 
   it('leaves out switched-off interests (videogames start off)', () => {
@@ -235,13 +235,13 @@ describe('v0.10 sharing and contact', () => {
     const { issueUrl, landingUrl } = await import('./share')
     const url = issueUrl('Fuente sugerida: ', 'Enlace:\n', 'ca', 'about')
     expect(url.startsWith('https://github.com/victoriza/myspace/issues/new?title=Fuente%20sugerida')).toBe(true)
-    expect(decodeURIComponent(url)).toContain('Space Feed 0.12.1 · ca · about')
+    expect(decodeURIComponent(url)).toContain('Space Feed 0.12.2 · ca · about')
     expect(landingUrl('es')).toBe('https://myspace.victoriza.com/')
     expect(landingUrl('ca')).toBe('https://myspace.victoriza.com/ca/')
   })
   it('orders 0.10 after 0.9', async () => {
     const { notesSince } = await import('./changelog')
-    expect(notesSince('0.9.3').map((e) => e.version)).toEqual(['0.12.1', '0.12.0'])
+    expect(notesSince('0.9.3').map((e) => e.version)).toEqual(['0.12.2', '0.12.1'])
   })
 })
 
@@ -281,5 +281,17 @@ describe('too-short articles', () => {
     expect(kept.map((i) => i.id).sort()).toEqual(['i2', 'i3', 'i4', 'i5'])
     expect(hidden.find((h) => h.item.id === 'i1')).toMatchObject({ reason: 'thin', kind: 'thin' })
     expect(readableWords({ summary: 'a b c' })).toBe(3)
+  })
+})
+
+describe('summaries without bylines', () => {
+  it('drops a leading author line and the WordPress footer', async () => {
+    const { summaryText, stripByline } = await import('./parse')
+    expect(stripByline('BY THE OPTIMIST DAILY EDITORIAL TEAM Concentrations of PFOS and PFOA fell.')).toBe('Concentrations of PFOS and PFOA fell.')
+    expect(stripByline('Por Ana López — Un pueblo recupera su escuela.')).toBe('Un pueblo recupera su escuela.')
+    expect(stripByline('By the river, children play again.')).toBe('By the river, children play again.')
+    expect(summaryText('<p><strong>By Jane Doe</strong></p><p>Seagrass is back along the coast this year.</p>')).toBe('Seagrass is back along the coast this year.')
+    expect(summaryText('<p>Seagrass is back. The post Seagrass returns appeared first on Positive News.</p>')).toBe('Seagrass is back.')
+    expect(summaryText('<p>Un pueblo reabre su escuela. La entrada Escuela abierta se publicó primero en En Positivo.</p>')).toBe('Un pueblo reabre su escuela.')
   })
 })

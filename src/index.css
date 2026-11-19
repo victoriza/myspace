@@ -681,3 +681,5 @@ a.more-row { color: inherit; text-decoration: none; }
 .card.is-listening .card-top::after { content: attr(data-listening); margin-left: auto; font-size: 12px; font-weight: 600; color: #7a520a; }
 :root[data-theme='night'] .card.is-listening .card-top::after { color: #f1d27a; }
 .listening-feed .feed-main { padding-bottom: 110px; }
+/* On the home sky, the listen button follows the sky, not the theme (phone in dark mode + light morning sky). */
+:root[data-theme='night'] .sky-home:not(.sky-dark) .listen-pill { background: #fff8e8; border-color: #e3d6b8; color: #5a430e; }

@@ -81,8 +81,8 @@ describe('feed pipeline', () => {
   it('shows what is new only for versions newer than the last one seen', () => {
     expect(compareVersions('0.10.0', '0.4.0')).toBeGreaterThan(0)
     expect(compareVersions('0.4.0', '0.4.0')).toBe(0)
-    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.12.0', '0.11.0'])
-    expect(notesSince('0.12.0')).toEqual([])
+    expect(notesSince('0.3.0').map((e) => e.version)).toEqual(['0.12.1', '0.12.0'])
+    expect(notesSince('0.12.1')).toEqual([])
   })
 
   it('leaves out switched-off interests (videogames start off)', () => {
@@ -235,13 +235,13 @@ describe('v0.10 sharing and contact', () => {
     const { issueUrl, landingUrl } = await import('./share')
     const url = issueUrl('Fuente sugerida: ', 'Enlace:\n', 'ca', 'about')
     expect(url.startsWith('https://github.com/victoriza/myspace/issues/new?title=Fuente%20sugerida')).toBe(true)
-    expect(decodeURIComponent(url)).toContain('Space Feed 0.12.0 · ca · about')
+    expect(decodeURIComponent(url)).toContain('Space Feed 0.12.1 · ca · about')
     expect(landingUrl('es')).toBe('https://myspace.victoriza.com/')
     expect(landingUrl('ca')).toBe('https://myspace.victoriza.com/ca/')
   })
   it('orders 0.10 after 0.9', async () => {
     const { notesSince } = await import('./changelog')
-    expect(notesSince('0.9.3').map((e) => e.version)).toEqual(['0.12.0', '0.11.0'])
+    expect(notesSince('0.9.3').map((e) => e.version)).toEqual(['0.12.1', '0.12.0'])
   })
 })
 

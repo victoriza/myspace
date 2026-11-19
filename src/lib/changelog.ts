@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.12.1',
+    notes: {
+      es: ['«Escuchar el feed de hoy» ahora se ve bien con el móvil en modo oscuro y el cielo claro de la mañana.'],
+      en: ['“Listen to today’s feed” is now easy to see with your phone in dark mode under the light morning sky.'],
+      ca: ['«Escoltar el feed d’avui» ara es veu bé amb el mòbil en mode fosc i el cel clar del matí.'],
+    },
+  },
+  {
     version: '0.12.0',
     notes: {
       es: ['Escucha el feed de hoy: el móvil te lo cuenta como un resumen tranquilo, cosa a cosa. Lo que escuchas cuenta como visto.', 'Fuera los artículos casi vacíos: si no hay al menos 50 palabras que leer, no entran en el feed.'],

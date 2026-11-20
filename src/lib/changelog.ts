@@ -6,6 +6,14 @@ import type { Lang } from './types'
  */
 export const CHANGELOG: { version: string; notes: Record<Lang, string[]> }[] = [
   {
+    version: '0.13.0',
+    notes: {
+      es: ['Contamos visitas a la web de forma anónima y sin cookies (Vercel Analytics), para saber si Space Feed le sirve a alguien. Nunca qué lees: eso sigue solo en tu móvil.'],
+      en: ['We now count visits to the site anonymously and without cookies (Vercel Analytics), to know whether Space Feed helps anyone. Never what you read: that stays on your phone.'],
+      ca: ['Comptem visites al web de manera anònima i sense galetes (Vercel Analytics), per saber si Space Feed serveix a algú. Mai què llegeixes: això continua només al teu mòbil.'],
+    },
+  },
+  {
     version: '0.12.3',
     notes: {
       es: ['Arreglado: con el móvil en modo oscuro, los textos sobre el cielo (filtros, «Quedan…», «Terminar por hoy») se veían mal de día.', 'Arreglado: la regla de 50 palabras escondía artículos buenos que solo traen resumen. Vuelven al feed.'],

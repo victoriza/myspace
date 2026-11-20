@@ -9,7 +9,7 @@
 - A calm, finite daily feed: it ends ("done for today").
 - Informed optimism: positive and constructive news with evidence. No politics, no gossip ("salseo"), no sensationalism, no hype.
 - Languages: Spanish (default), English, Catalan. Every string goes in `src/i18n/{es,en,ca}.ts`.
-- Everything runs on the phone: no API keys, no logins. The only server piece is `api/relay.ts` (CORS relay).
+- Everything runs on the phone: no API keys, no logins. The only server piece is `api/relay.ts` (CORS relay). Vercel Web Analytics (v0.13) counts visits anonymously, cookie-free; `src/lib/analytics.ts` strips everything after the path (no #screen/article, no query) — keep it that way, and keep the privacy copy (Why, Más → Tus datos) honest.
 - Subtle UI: small, quiet controls; nothing that pushes the person to stay longer.
 - Accessible: landmarks on every screen (header / main / nav), screen changes set the tab title and focus the h1, foreign-language titles carry `lang`, 44 px touch targets, text over the sky picked for WCAG AA contrast (tested every 15 min of the day), layouts wrap at 200% text. Check with axe before releasing.
 - Cosy motion: slow, soft, play-once animations (sun and waves language); nothing loops for attention; everything respects "reduce motion".
